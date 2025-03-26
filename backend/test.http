@@ -1,4 +1,20 @@
 
-### Test switch config retrieval
-GET http://localhost:5000/config?switch=Switch1
-Accept: application/json
+# Test check_device endpoint
+GET http://localhost:5000/check_device?ip=10.115.193.47
+
+###
+
+
+# Test check_device endpoint
+GET http://localhost:5000/check_device?ip=10.115.193.4
+
+###
+
+# Test /config endpoint with valid Cisco IP
+GET http://localhost:5000/config?ip=10.115.193.47
+
+###
+
+# Test /config endpoint with non-Cisco IP
+GET http://localhost:5000/config?ip=10.60.40.4
+
