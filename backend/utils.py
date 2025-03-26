@@ -1,6 +1,7 @@
 import socket
 import re
 import ipaddress
+import os
 
 EXAMPLE_CONFIG = """
 Port      Name               Status       Vlan       Duplex  Speed   Type
@@ -42,3 +43,15 @@ def is_valid_ip(ip):
         return True
     except ValueError:
         return False
+
+def is_ip_in_subnet(ip):
+    """Check if the given IP address is in any of the subnets defined in .env."""
+    subnets = os.getenv("TRUSTED_SUBNETS", "").split(",")
+    try:
+        ip_obj = ipaddress.ip_address(ip)
+        for subnet in subnets:
+            if ip_obj in ipaddress.ip_network(subnet.strip(), strict=False):
+                return True
+        return False
+    except ValueError:
+        return False  # Invalid IP address
