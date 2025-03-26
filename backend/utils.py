@@ -36,8 +36,6 @@ def is_cisco_device(ip):
     except Exception:
         return False
 
-
-
 def is_valid_ip(ip):
     try:
         ipaddress.ip_address(ip)
