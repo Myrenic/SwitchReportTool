@@ -1,23 +1,22 @@
 import socket
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from getmac import get_mac_address
 import re
+import ipaddress  # Importing ipaddress module for IP validation
 
 app = Flask(__name__)
 CORS(app)
 
 EXAMPLE_CONFIG = """
 Port      Name               Status       Vlan       Duplex  Speed   Type
-Gi1/0/1                     connected    10         full    1000    10/100/1000BaseTX
-Gi1/0/2                     notconnect   20         auto    auto    10/100/1000BaseTX
-Gi1/0/3                     connected    30         full    1000    10/100/1000BaseTX
-Gi1/0/4                     err-disabled 40         full    1000    10/100/1000BaseTX
-Gi1/0/5                     disabled     50         auto    auto    10/100/1000BaseTX
-Te1/1/1                     connected    trunk      full    10000   10GBase-SR
-Te1/1/2                     notconnect   trunk      auto    auto    10GBase-SR
+Gi1/0/1   connected          10           full      1000    10/100/1000BaseTX
+Gi1/0/2   notconnect         20           auto      auto    10/100/1000BaseTX
+Gi1/0/3   connected          30           full      1000    10/100/1000BaseTX
+Gi1/0/4   err-disabled       40           full      1000    10/100/1000BaseTX
+Gi1/0/5   disabled           50           auto      auto    10/100/1000BaseTX
+Te1/1/1   connected          trunk       full      10000   10GBase-SR
+Te1/1/2   notconnect         trunk       auto      auto    10GBase-SR
 """
-
 
 def parse_cisco_output(data):
     lines = data.strip().split("\n")
@@ -31,45 +30,59 @@ def parse_cisco_output(data):
     
     return parsed_data
 
-# Check if device is a Cisco switch based on SSH banner
 def is_cisco_device(ip):
+    """
+    Check if the device at the given IP address is a Cisco device by inspecting its SSH banner.
+    """
     try:
-        # Try to connect to the IP address over socket (without SSH authentication)
         sock = socket.create_connection((ip, 22), timeout=2)
         sock.settimeout(2)
         
-        # Capture the banner (before any authentication prompt)
         banner = sock.recv(1024).decode('utf-8', errors='ignore')
-        if "Cisco" in banner:
-            sock.close()
-            return True
-        
         sock.close()
-        return False
+        
+        return "Cisco" in banner
     except Exception as e:
-        print(f"Error (is_cisco_device): {e}")
+        print(f"Error in is_cisco_device: {e}")
+        return False
+
+def is_valid_ip(ip):
+    try:
+        ipaddress.ip_address(ip)
+        return True
+    except ValueError:
         return False
 
 @app.route('/check_device', methods=['GET'])
 def check_device():
+    """
+    Endpoint to check if the device at a given IP is a Cisco device.
+    """
     ip = request.args.get("ip")
     if not ip:
-        return jsonify({"error (check_device)": "No IP address provided"}), 400
-
-    # Check if the device is a Cisco network device by SSH banner
-    is_cisco = is_cisco_device(ip)
+        return jsonify({"error": "No IP address provided"}), 400
     
+    # Validate the IP address
+    if not is_valid_ip(ip):
+        return jsonify({"error": "Invalid IP address"}), 400
+
+    is_cisco = is_cisco_device(ip)
     return jsonify({"ip": ip, "is_cisco": is_cisco})
 
 @app.route('/config', methods=['GET'])
 def get_config():
+    """
+    Endpoint to retrieve the configuration of a Cisco device (mocked in this case).
+    """
     ip = request.args.get("ip")
     if not ip:
-        return jsonify({"error (get_config)": "No IP address provided"}), 400
+        return jsonify({"error": "No IP address provided"}), 400
     
-    # Check if the device is a Cisco network device by SSH banner
+    # Validate the IP address
+    if not is_valid_ip(ip):
+        return jsonify({"error": "Invalid IP address"}), 400
+    
     is_cisco = is_cisco_device(ip)
-    
     if not is_cisco:
         return jsonify({"is_cisco": is_cisco})
     

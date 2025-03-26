@@ -16,5 +16,5 @@ GET http://localhost:5000/config?ip=10.115.193.47
 ###
 
 # Test /config endpoint with non-Cisco IP
-GET http://localhost:5000/config?ip=10.60.40.4
+GET http://localhost:5000/config?ip=10.115.193.110
 
