@@ -9,7 +9,13 @@ load_dotenv()
 API_SECRET_KEY = os.getenv("API_SECRET_KEY")
 
 app = Flask(__name__)
-CORS(app)
+
+# Get allowed origins from .env
+allowed_origins = os.getenv("CORS_ORIGINS", "").split(",")
+
+# Apply CORS globally for all routes
+CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
+
 
 app.register_blueprint(check_device.bp)
 app.register_blueprint(config.bp)
