@@ -1,0 +1,4 @@
+
+### Test switch config retrieval
+GET http://localhost:5000/config?switch=Switch1
+Accept: application/json
