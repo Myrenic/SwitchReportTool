@@ -1,0 +1,95 @@
+/* PortConfig.css */
+
+.port-config-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-field {
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.confirm-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #797979;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.home-btn {
+  padding: 10px;
+  background-color: #f1f1f1;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 100%
+}
+
+.color-key {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.green-dot {
+  color: green;
+}
+
+.light-blue-dot {
+  color: lightblue;
+}
+
+.red-dot {
+  color: red;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.config-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.config-table th, .config-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+ .config-table th {
+  background-color: #f1f1f1;
+}
+
+.port-row.up td:nth-child(1){
+  background-color: #52b352;
+}
+
+.port-row.up td:nth-child(1){
+  background-color: #52b352;
+}
+.port-row.down td:nth-child(1){
+  background-color: #407af7;
+}
+
+.port-row td:nth-child(1){
+  background-color: #ff4a4a;
+}

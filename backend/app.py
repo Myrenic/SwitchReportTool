@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-from routes import check_device, config
+from routes import check_device, port_config
 
 load_dotenv()
 
@@ -18,11 +18,19 @@ CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=
 
 
 app.register_blueprint(check_device.bp)
-app.register_blueprint(config.bp)
+app.register_blueprint(port_config.bp)
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        response = jsonify({"message": "CORS preflight success"})
+        response.headers.add("Access-Control-Allow-Origin", "http://10.115.196.130:3000")
+        response.headers.add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        response.headers.add("Access-Control-Allow-Headers", "Authorization, Content-Type")
+        return response, 200
 
 @app.before_request
 def require_api_key():
-    if request.path.startswith('/check_device') or request.path.startswith('/config'):
+    if request.path.startswith('/check_device') or request.path.startswith('/port_config'):
         api_key = request.headers.get("Authorization")
         if api_key != f"Bearer {API_SECRET_KEY}":
             return jsonify({"error": "Unauthorized"}), 403

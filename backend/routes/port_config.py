@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
 from utils import is_cisco_device, is_valid_ip, parse_cisco_output, EXAMPLE_CONFIG, is_ip_in_subnet
 
-bp = Blueprint('config', __name__)
+bp = Blueprint('port_config', __name__)
 
-@bp.route('/config', methods=['GET'])
+@bp.route('/port_config', methods=['GET'])
 def get_config():
     ip = request.args.get("ip")
     if not is_valid_ip(ip):
