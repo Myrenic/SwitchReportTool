@@ -1,4 +1,4 @@
-name: Docker Build
+name: Docker Build Frontend
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: myrenic/switchreportTool  # Ensure this is lowercase
+  IMAGE_NAME: myrenic/switchreportToolfrontend  # Ensure this is lowercase
 
 jobs:
   build:
@@ -36,7 +36,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: frontend/
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
