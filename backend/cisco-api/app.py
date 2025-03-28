@@ -5,6 +5,7 @@ import requests
 import re
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import socket
 
 load_dotenv()
 
@@ -22,14 +23,31 @@ def post_to_api(url, data):
 
 def run_cisco_commands(host_data, commands):
     try:
-        with ConnectHandler(**host_data) as net_connect:
-            output = {}
-            for command in commands:
-                output[command] = net_connect.send_command(command, use_textfsm=True)
-            return output
+        if is_cisco_device(host_data['host']):
+            with ConnectHandler(**host_data) as net_connect:
+                output = {}
+                for command in commands:
+                    output[command] = net_connect.send_command(command, use_textfsm=True)
+                return output
     except Exception as e:
         print(f"Error posting to Cisco: {e}")
         return {}
+
+
+def is_cisco_device(host, port=22):
+    try:
+        # Create a socket and connect to the device
+        sock = socket.create_connection((host, port), timeout=2)
+        
+        # Receive the SSH banner (first 1024 bytes)
+        banner = sock.recv(1024).decode('utf-8', errors='ignore')
+        sock.close()
+        print(banner)
+        return "Cisco" in banner
+    except Exception as e:
+        print(f"Error connecting to: {e}")
+        return False
+
 
 @app.route('/update_switch', methods=['POST'])
 def update_switch():
