@@ -11,3 +11,4 @@ This tool allows you to check if a device is a Cisco switch and retrieve a mocke
 - **Check if a device at a given IP address is a Cisco switch**.
 - **Retrieve a mocked configuration report of a Cisco switch**.
 
+.
