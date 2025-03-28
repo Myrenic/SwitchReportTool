@@ -7,7 +7,7 @@ const SearchMac = () => {
 
   const handleSearch = () => {
     if (macAddress) {
-      fetch(`http://localhost:5000/get_ports_by_mac/${macAddress}`)
+      fetch(`${process.env.REACT_APP_DATABASE_API_URL}/get_ports_by_mac/${macAddress}`)
         .then(response => response.json())
         .then(data => {
           if (data.length > 0) {

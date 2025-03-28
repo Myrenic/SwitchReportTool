@@ -7,7 +7,7 @@ const AddSwitch = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    fetch('http://localhost:5001/update_switch', {
+    fetch(`${process.env.REACT_APP_CISCO_API_URL}/update_switch`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
