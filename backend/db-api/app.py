@@ -56,6 +56,9 @@ CREATE TABLE IF NOT EXISTS historical_interface_stats (
     mac_address VARCHAR(50),
     ip_address VARCHAR(50),
     switch_name VARCHAR(255),
+    lldp_neighbor VARCHAR(255),
+    lldp_neighbor_device VARCHAR(255),
+    lldp_neighbor_mgmt_ip VARCHAR(50),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
@@ -69,7 +72,6 @@ def setup_database():
             cursor.execute(create_master_table)
             cursor.execute(create_historical_switch_table)
             cursor.execute(create_historical_interface_table)
-
             
             print("Tables are set up successfully.")
     except Exception as e:
@@ -124,9 +126,9 @@ def store_data():
             # Insert into historical_interface_stats
             for interface in interface_stats:
                 cursor.execute("""
-                    INSERT INTO historical_interface_stats (switch_id, port, name, status, vlan_id, duplex, speed, type, fc_mode, mac_address, ip_address, switch_name)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                """, (switch_id, interface['port'], interface['name'], interface['status'], interface['vlan_id'], interface['duplex'], interface['speed'], interface['type'], interface['fc_mode'], interface['mac_address'], interface['ip_address'], interface['switch_name']))
+                    INSERT INTO historical_interface_stats (switch_id, port, name, status, vlan_id, duplex, speed, type, fc_mode, mac_address, ip_address, switch_name, lldp_neighbor, lldp_neighbor_device, lldp_neighbor_mgmt_ip)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                """, (switch_id, interface['port'], interface['name'], interface['status'], interface['vlan_id'], interface['duplex'], interface['speed'], interface['type'], interface['fc_mode'], interface['mac_address'], interface['ip_address'], interface['switch_name'], interface['lldp_neighbor'], interface['lldp_neighbor_device'], interface['lldp_neighbor_mgmt_ip']))
             
         return jsonify({"message": "Data stored successfully"}), 201
     except Exception as e:
@@ -199,7 +201,10 @@ def get_latest_ports(identifier):
                     "mac_address": port[10],
                     "ip_address": port[11],
                     "switch_name": port[12],
-                    "timestamp": port[13]
+                    "lldp_neighbor": port[13],
+                    "lldp_neighbor_device": port[14],
+                    "lldp_neighbor_mgmt_ip": port[15],
+                    "timestamp": port[16]
                 })
         return jsonify(port_list), 200
     except Exception as e:
@@ -276,7 +281,10 @@ def get_all_ports(identifier):
                     "mac_address": port[10],
                     "ip_address": port[11],
                     "switch_name": port[12],
-                    "timestamp": port[13]
+                    "lldp_neighbor": port[13],
+                    "lldp_neighbor_device": port[14],
+                    "lldp_neighbor_mgmt_ip": port[15],
+                    "timestamp": port[16]
                 })
         return jsonify(port_list), 200
     except Exception as e:
@@ -319,7 +327,10 @@ def get_ports_by_mac(mac_address):
                     "mac_address": port[10],
                     "ip_address": port[11],
                     "switch_name": port[12],
-                    "timestamp": port[13]
+                    "lldp_neighbor": port[13],
+                    "lldp_neighbor_device": port[14],
+                    "lldp_neighbor_mgmt_ip": port[15],
+                    "timestamp": port[16]
                 })
         return jsonify(port_list), 200
     except Exception as e:

@@ -9,18 +9,18 @@ GET http://localhost:5000/get_all_ports/NLGRO-B1-MERA-LAN06
 
 
 ### Get Latest Ports for a Specific Switch
-GET http://localhost:5000/get_latest_ports/NLGRO-B1-MERA-LAN06
+GET http://localhost:5000/get_latest_ports/10.115.193.50
 
 
 ### Get Switch Data by Hostname
-GET http://10.115.202.50:5000/get_switch/NLGRO-B1-MERA-LAN06
+GET http://10.115.202.50:5000/get_switch/10.115.193.50
 
 ### Get Switch Data by IP Address
 GET http://10.115.202.50:5000/get_all_switches
 
 
 ### Call the update_switch API
-POST http://10.115.202.50:5001/update_switch
+POST http://localhost:5001/update_switch
 Content-Type: application/json
 
 {

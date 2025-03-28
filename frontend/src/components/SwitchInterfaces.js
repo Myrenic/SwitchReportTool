@@ -16,6 +16,7 @@ const SwitchInterfaces = () => {
       .then(data => setSwitchPorts(data))
       .catch(error => console.error('Error fetching switch ports:', error));
   };
+  console.log(switchPorts);
 
   const handleSelectSwitch = (sw) => {
     setSelectedSwitch(sw);
