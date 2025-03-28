@@ -3,7 +3,7 @@ name: Docker Build Frontend
 on:
   push:
     branches: [ "master" ]
-    tags: [ 'frontend*.*.*' ]
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "master" ]
     
@@ -38,6 +38,6 @@ jobs:
         with:
           context: frontend/
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:frontend-latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
