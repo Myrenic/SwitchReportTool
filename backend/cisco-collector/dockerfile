@@ -21,8 +21,9 @@ COPY . /app/
 EXPOSE 5001
 
 # Set environment variables for Flask
-ENV FLASK_APP=cisco-api.py
+ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=5001
 
 # Run the Flask application
 CMD ["flask", "run"]
