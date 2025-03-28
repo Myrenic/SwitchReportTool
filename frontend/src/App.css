@@ -1,171 +1,192 @@
 /* src/App.css */
 body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f2f5;
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f2f5;
+}
+
+.App {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+h2 {
+  color: #333;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.refresh-button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.refresh-button:hover {
+  background-color: #0056b3;
+}
+
+.refresh-message {
+  text-align: center;
+  color: green;
+}
+
+.content, .top-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.box {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  flex: 1 1 calc(33.333% - 20px);
+  box-sizing: border-box;
+}
+
+.switch-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.switch-list-controls {
+  display: flex;
+  align-items: center;
+}
+
+.switch-list select, .add-switch input, .add-switch button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.switch-list select {
+  flex-grow: 1;
+}
+
+.add-switch {
+  flex: 1 1 100%;
+}
+
+.add-switch form {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-switch button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.add-switch button:hover {
+  background-color: #0056b3;
+}
+
+.switch-ports table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.switch-ports th, .switch-ports td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.switch-ports th {
+  background-color: #f8f9fa;
+}
+
+.switch-ports tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.switch-ports tr:hover {
+  background-color: #e9ecef;
+}
+
+.home {
+  text-align: center;
+}
+
+.home ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.home li {
+  margin: 10px 0;
+}
+
+.home a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.home a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .switch-ports td:nth-child(8),
+  .switch-ports th:nth-child(8) {
+    display: none;
   }
-  
-  .App {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+}
+
+@media (max-width: 992px) {
+  .switch-ports td:nth-child(7),
+  .switch-ports th:nth-child(7),
+  .switch-ports td:nth-child(8),
+  .switch-ports th:nth-child(8) {
+    display: none;
   }
-  
-  h1 {
-    text-align: center;
-    color: #333;
+}
+
+@media (max-width: 768px) {
+  .switch-ports td:nth-child(6),
+  .switch-ports th:nth-child(6),
+  .switch-ports td:nth-child(7),
+  .switch-ports th:nth-child(7),
+  .switch-ports td:nth-child(8),
+  .switch-ports th:nth-child(8) {
+    display: none;
   }
-  
-  h2 {
-    color: #333;
+}
+
+@media (max-width: 576px) {
+  .switch-ports td:nth-child(5),
+  .switch-ports th:nth-child(5),
+  .switch-ports td:nth-child(6),
+  .switch-ports th:nth-child(6),
+  .switch-ports td:nth-child(7),
+  .switch-ports th:nth-child(7),
+  .switch-ports td:nth-child(8),
+  .switch-ports th:nth-child(8) {
+    display: none;
   }
-  
-  .top-bar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .refresh-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 10px;
-  }
-  
-  .refresh-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .refresh-message {
-    text-align: center;
-    color: green;
-  }
-  
-  .content, .top-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  
-  .box {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    flex: 1 1 calc(33.333% - 20px);
-    box-sizing: border-box;
-  }
-  
-  .switch-list {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .switch-list-controls {
-    display: flex;
-    align-items: center;
-  }
-  
-  .switch-list select, .add-switch input, .add-switch button {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  .switch-list select {
-    flex-grow: 1;
-  }
-  
-  .add-switch {
-    flex: 1 1 100%;
-  }
-  
-  .add-switch form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .add-switch button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .add-switch button:hover {
-    background-color: #0056b3;
-  }
-  
-  .switch-ports table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  .switch-ports th, .switch-ports td {
-    text-align: left;
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .switch-ports th {
-    background-color: #f8f9fa;
-  }
-  
-  .switch-ports tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-  
-  .switch-ports tr:hover {
-    background-color: #e9ecef;
-  }
-  
-  /* Responsive styles */
-  @media (max-width: 1200px) {
-    .switch-ports td:nth-child(8),
-    .switch-ports th:nth-child(8) {
-      display: none;
-    }
-  }
-  
-  @media (max-width: 992px) {
-    .switch-ports td:nth-child(7),
-    .switch-ports th:nth-child(7),
-    .switch-ports td:nth-child(8),
-    .switch-ports th:nth-child(8) {
-      display: none;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .switch-ports td:nth-child(6),
-    .switch-ports th:nth-child(6),
-    .switch-ports td:nth-child(7),
-    .switch-ports th:nth-child(7),
-    .switch-ports td:nth-child(8),
-    .switch-ports th:nth-child(8) {
-      display: none;
-    }
-  }
-  
-  @media (max-width: 576px) {
-    .switch-ports td:nth-child(5),
-    .switch-ports th:nth-child(5),
-    .switch-ports td:nth-child(6),
-    .switch-ports th:nth-child(6),
-    .switch-ports td:nth-child(7),
-    .switch-ports th:nth-child(7),
-    .switch-ports td:nth-child(8),
-    .switch-ports th:nth-child(8) {
-      display: none;
-    }
-  }
-  
+}
