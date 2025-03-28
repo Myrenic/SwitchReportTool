@@ -1,5 +1,7 @@
-flask
-psycopg2-binary
+os
 python-dotenv
-flask-cors
 netmiko
+requests
+flask
+flask-cors
+re
