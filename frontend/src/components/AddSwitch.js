@@ -6,8 +6,9 @@ const AddSwitch = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const ciscoUrl = window.config.CISCO_API_URL;
 
-    fetch(`${process.env.REACT_APP_CISCO_API_URL}/update_switch`, {
+    fetch(`${ciscoUrl}/update_switch`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

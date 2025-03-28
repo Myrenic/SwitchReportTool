@@ -4,7 +4,8 @@ const SwitchList = ({ onSelectSwitch, onRefresh }) => {
   const [switches, setSwitches] = useState([]);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_DATABASE_API_URL}/get_all_switches`)
+    const dbUrl = window.config.DATABASE_API_URL;
+    fetch(`${dbUrl}/get_all_switches`)
       .then(response => response.json())
       .then(data => setSwitches(data))
       .catch(error => console.error('Error fetching switches:', error));

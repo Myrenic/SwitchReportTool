@@ -7,11 +7,6 @@ import SwitchInterfaces from './components/SwitchInterfaces';
 import SearchMac from './components/SearchMac';
 
 function App() {
-  console.log("database url:");
-  console.log(process.env.REACT_APP_DATABASE_API_URL);
-  console.log("cisco url:");
-  console.log(process.env.REACT_APP_CISCO_API_URL);
-
   return (
     <Router>
       <div className="App">

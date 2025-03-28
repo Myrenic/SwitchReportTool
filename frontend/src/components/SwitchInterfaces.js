@@ -9,8 +9,9 @@ const SwitchInterfaces = () => {
   const [switchPorts, setSwitchPorts] = useState([]);
   const [refreshMessage, setRefreshMessage] = useState('');
   const fetchSwitchPorts = (hostname) => {
+  const dbUrl = window.config.DATABASE_API_URL;
 
-    fetch(`${process.env.REACT_APP_DATABASE_API_URL}/get_latest_ports/${hostname}`)
+    fetch(`${dbUrl}/get_latest_ports/${hostname}`)
       .then(response => response.json())
       .then(data => setSwitchPorts(data))
       .catch(error => console.error('Error fetching switch ports:', error));
@@ -23,7 +24,8 @@ const SwitchInterfaces = () => {
 
   const handleRefresh = () => {
     if (selectedSwitch) {
-      fetch(`${process.env.REACT_APP_DATABASE_API_URL}/update_switch`, {
+      const dbUrl = window.config.DATABASE_API_URL;
+      fetch(`${dbUrl}/update_switch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
