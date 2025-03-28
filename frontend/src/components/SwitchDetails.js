@@ -1,4 +1,3 @@
-// src/components/SwitchDetails.js
 import React from 'react';
 
 const SwitchDetails = ({ switch: selectedSwitch }) => {

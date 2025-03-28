@@ -1,4 +1,3 @@
-// src/components/SwitchManagement.js
 import React, { useState } from 'react';
 import SwitchList from './SwitchList';
 import SwitchDetails from './SwitchDetails';

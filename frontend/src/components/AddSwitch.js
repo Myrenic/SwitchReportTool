@@ -1,4 +1,3 @@
-// src/components/AddSwitch.js
 import React, { useState } from 'react';
 
 const AddSwitch = () => {

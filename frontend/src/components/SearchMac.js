@@ -1,4 +1,3 @@
-// src/components/SearchMac.js
 import React, { useState } from 'react';
 
 const SearchMac = () => {

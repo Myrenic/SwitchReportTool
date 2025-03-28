@@ -1,4 +1,3 @@
-// src/components/SwitchPorts.js
 import React from 'react';
 
 const sortPorts = (a, b) => {

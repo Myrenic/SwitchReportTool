@@ -1,4 +1,3 @@
-// src/components/SwitchList.js
 import React, { useState, useEffect } from 'react';
 
 const SwitchList = ({ onSelectSwitch, onRefresh }) => {
