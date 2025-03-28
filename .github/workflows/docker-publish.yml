@@ -3,7 +3,7 @@ name: Docker Build Frontend
 on:
   push:
     branches: [ "main" ]
-    tags: [ 'v*.*.*' ]
+    tags: [ 'frontend*.*.*' ]
   pull_request:
     branches: [ "main" ]
     
@@ -13,7 +13,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: myrenic/switchreportToolfrontend  # Ensure this is lowercase
+  IMAGE_NAME: myrenic/switchreportTool  # Ensure this is lowercase
 
 jobs:
   build:
