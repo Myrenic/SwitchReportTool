@@ -1,8 +1,12 @@
+import os
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import psycopg2
 from psycopg2 import sql
 from flask_cors import CORS
 import re
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -11,9 +15,9 @@ CORS(app)
 db_params = {
     'dbname': 'postgres',
     'user': 'postgres',
-    'password': 'Test12345TestTest',
-    'host': '10.115.202.50',
-    'port': '5432'
+    'password': os.getenv("DB_PASSWORD"),
+    'host': os.getenv("DB_HOST"),
+    'port': os.getenv("DB_PORT"),
 }
 
 # SQL commands for creating tables
