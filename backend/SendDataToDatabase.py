@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import psycopg2
 from psycopg2 import sql
 from flask_cors import CORS
-
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -56,8 +56,6 @@ CREATE TABLE IF NOT EXISTS historical_interface_stats (
 );
 """
 
-
-
 def setup_database():
     conn = psycopg2.connect(**db_params)
     conn.autocommit = True
@@ -75,10 +73,20 @@ def setup_database():
     finally:
         conn.close()
 
+def format_mac_address(mac):
+    # Remove any non-hexadecimal characters
+    mac = re.sub(r'[^0-9a-fA-F]', '', mac)
+    # Convert to lower case
+    mac = mac.lower()
+    # Ensure it's 12 characters long
+    if len(mac) != 12:
+        raise ValueError("Invalid MAC address format")
+    # Convert to e430.2250.abf3 format
+    return f'{mac[0:4]}.{mac[4:8]}.{mac[8:12]}'
+
 @app.route('/store_data', methods=['POST'])
 def store_data():
     data = request.json
-    
 
     switch_stats = data.get('switch_stats')
     interface_stats = data.get('interface_stats')
@@ -248,6 +256,49 @@ def get_all_ports(identifier):
             """, (switch_id,))
             ports = cursor.fetchall()
 
+            port_list = []
+            for port in ports:
+                port_list.append({
+                    "id": port[0],
+                    "switch_id": port[1],
+                    "port": port[2],
+                    "name": port[3],
+                    "status": port[4],
+                    "vlan_id": port[5],
+                    "duplex": port[6],
+                    "speed": port[7],
+                    "type": port[8],
+                    "fc_mode": port[9],
+                    "mac_address": port[10],
+                    "ip_address": port[11],
+                    "switch_name": port[12],
+                    "timestamp": port[13]
+                })
+        return jsonify(port_list), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/get_ports_by_mac/<mac_address>', methods=['GET'])
+def get_ports_by_mac(mac_address):
+    try:
+        formatted_mac = format_mac_address(mac_address)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    
+    conn = psycopg2.connect(**db_params)
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT * FROM historical_interface_stats
+                WHERE mac_address = %s;
+            """, (formatted_mac,))
+            ports = cursor.fetchall()
+
+            if not ports:
+                return jsonify({"error": "MAC address not found"}), 404
+            
             port_list = []
             for port in ports:
                 port_list.append({

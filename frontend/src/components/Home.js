@@ -8,6 +8,7 @@ const Home = () => {
       <h1>Welcome to Mike's Network Management Tools</h1>
       <ul>
         <li><Link to="/switch-Interfaces">Switch Interfaces</Link></li>
+        <li><Link to="/search-mac">Search MAC Address</Link></li>
         {/* Add more tools here */}
       </ul>
     </div>

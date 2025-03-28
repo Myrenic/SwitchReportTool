@@ -42,7 +42,7 @@ const SwitchInterfaces = () => {
 
   return (
     <div>
-      <h1>Switch SwitchInterfaces</h1>
+      <h1>Switch Interfaces</h1>
       <div className="top-bar">
         <div className="box">
           <SwitchList onSelectSwitch={handleSelectSwitch} onRefresh={handleRefresh} />
