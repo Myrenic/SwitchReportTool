@@ -8,19 +8,19 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install the dependencies
-RUN npm install --only=production
+RUN npm install
 
 # Copy the rest of the application source code to the container
 COPY . .
 
-# Build the React application
+# Build the application using Vite
 RUN npm run build
 
 # Use the official Nginx image to serve the built static files
 FROM nginx:alpine
 
 # Copy the build output from the 'build' stage to the Nginx HTML directory
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy the entrypoint script into the container
 COPY entrypoint.sh /entrypoint.sh
@@ -32,5 +32,5 @@ EXPOSE 80
 # Set the entrypoint script to inject environment variables into the build files
 ENTRYPOINT ["/entrypoint.sh"]
 
-# Run the Nginx service to serve the React app
+# Run the Nginx service to serve the app
 CMD ["nginx", "-g", "daemon off;"]
