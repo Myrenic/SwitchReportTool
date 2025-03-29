@@ -353,4 +353,4 @@ def get_ports_by_mac(mac_address):
 
 if __name__ == "__main__":
     setup_database()
-    app.run(debug=True)
+    app.run()
