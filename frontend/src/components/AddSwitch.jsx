@@ -1,4 +1,12 @@
 import React, { useState } from 'react';
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+} from '@mui/material';
+import config from '../../config';
 
 const AddSwitch = () => {
   const [ipAddress, setIpAddress] = useState('');
@@ -6,7 +14,7 @@ const AddSwitch = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const ciscoUrl = window.config.CISCO_API_URL;
+    const ciscoUrl = config.CISCO_API_URL;
 
     fetch(`${ciscoUrl}/update_switch`, {
       method: 'POST',
@@ -24,22 +32,30 @@ const AddSwitch = () => {
   };
 
   return (
-    <div className="add-switch">
-      <h2>Add New Switch</h2>
+    <Paper elevation={3} className="add-switch" sx={{ padding: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Add New Switch
+      </Typography>
       <form onSubmit={handleSubmit}>
-        <label>
-          IP Address:
-          <input
-            type="text"
+        <Box display="flex" flexDirection="column" gap={2}>
+          <TextField
+            label="IP Address"
+            variant="outlined"
             value={ipAddress}
             onChange={(e) => setIpAddress(e.target.value)}
             required
           />
-        </label>
-        <button type="submit">Add Switch</button>
+          <Button variant="contained" color="primary" type="submit">
+            Add Switch
+          </Button>
+        </Box>
       </form>
-      {message && <p>{message}</p>}
-    </div>
+      {message && (
+        <Typography variant="body1" color="textSecondary" sx={{ marginTop: 2 }}>
+          {message}
+        </Typography>
+      )}
+    </Paper>
   );
 };
 

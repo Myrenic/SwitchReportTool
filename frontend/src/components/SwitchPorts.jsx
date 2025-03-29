@@ -10,7 +10,7 @@ import {
   Paper,
   IconButton,
   Collapse,
-  Box
+  Box,
 } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -45,7 +45,7 @@ const Row = ({ row }) => {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <React.Fragment>
+    <>
       <TableRow>
         <TableCell>
           <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
@@ -80,7 +80,7 @@ const Row = ({ row }) => {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
-              <Table size="small" aria-label="purchases">
+              <Table size="small" aria-label="details">
                 <TableBody>
                   <TableRow>
                     <TableCell>Type</TableCell>
@@ -108,7 +108,7 @@ const Row = ({ row }) => {
           </Collapse>
         </TableCell>
       </TableRow>
-    </React.Fragment>
+    </>
   );
 };
 
@@ -149,11 +149,6 @@ const SwitchPorts = ({ ports }) => {
                     onClick={(event) => handleRequestSort(event, headCell.id)}
                   >
                     {headCell.label}
-                    {orderBy === headCell.id ? (
-                      <span>
-                        {order === 'desc' ? ' 🔽' : ' 🔼'}
-                      </span>
-                    ) : null}
                   </TableSortLabel>
                 ) : (
                   headCell.label
