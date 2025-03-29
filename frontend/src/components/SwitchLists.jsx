@@ -7,7 +7,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import config from '../../config';
+import config from '../config'; // Ensure you have your config file to get API URL
 
 const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
   const [switches, setSwitches] = useState([]);

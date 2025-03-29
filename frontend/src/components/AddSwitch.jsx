@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, CircularProgress, Container, Paper } from '@mui/material';
-import config from '../../config'; // Ensure you have your config file to get API URL
+import config from '../config'; // Ensure you have your config file to get API URL
 
 const AddSwitch = () => {
   const [switchIp, setSwitchIp] = useState('');

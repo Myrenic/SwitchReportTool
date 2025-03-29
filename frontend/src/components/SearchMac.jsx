@@ -12,7 +12,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import config from '../../config';
+import config from '../config'; // Ensure you have your config file to get API URL
 
 const SearchMac = () => {
   const [macAddress, setMacAddress] = useState('');

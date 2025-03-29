@@ -4,7 +4,7 @@ import SwitchList from '../../components/SwitchLists';
 import SwitchDetails from '../../components/SwitchDetails';
 import SwitchPorts from '../../components/SwitchPorts';
 import AddSwitch from '../../components/AddSwitch';
-import config from '../../../config';
+import config from '../../config'; 
 
 console.log(config.CISCO_API_URL);
 
