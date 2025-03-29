@@ -61,7 +61,8 @@ def switch_exists(ip_address):
 def add_switch():
     ip_address = request.json.get('ip_address')
     password = request.json.get('password')
-
+    if is_cisco_device:
+        return jsonify({"error": "Not a Cisco device"}), 400
     if not ip_address:
         return jsonify({"error": "IP address is required"}), 400
 
