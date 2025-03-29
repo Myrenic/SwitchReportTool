@@ -24,5 +24,14 @@ POST http://localhost:5001/update_switch
 Content-Type: application/json
 
 {
-  "ip_address": "10.115.193.50"
+  "ip_address": "10.32.1.46"
+}
+
+### Call the update_switch API
+POST http://localhost:5001/add_switch
+Content-Type: application/json
+
+{
+  "ip_address": "10.32.1.46",
+  "password": "henk"
 }
