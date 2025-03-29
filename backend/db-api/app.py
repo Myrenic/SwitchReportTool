@@ -1,4 +1,5 @@
 import os
+import traceback
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import psycopg2
@@ -76,6 +77,7 @@ def setup_database():
             print("Tables are set up successfully.")
     except Exception as e:
         print(f"An error occurred: {e}")
+        print(traceback.format_exc())
     finally:
         conn.close()
 
@@ -132,7 +134,9 @@ def store_data():
             
         return jsonify({"message": "Data stored successfully"}), 201
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"An error occurred: {e}")
+        print(traceback.format_exc())
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
     finally:
         conn.close()
 
@@ -155,7 +159,9 @@ def get_all_switches():
                 })
         return jsonify(switch_list), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"An error occurred: {e}")
+        print(traceback.format_exc())
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
     finally:
         conn.close()
 
@@ -208,7 +214,9 @@ def get_latest_ports(identifier):
                 })
         return jsonify(port_list), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"An error occurred: {e}")
+        print(traceback.format_exc())
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
     finally:
         conn.close()
 
@@ -236,7 +244,9 @@ def get_switch(identifier):
             }
         return jsonify(switch_data), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"An error occurred: {e}")
+        print(traceback.format_exc())
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
     finally:
         conn.close()
 
@@ -288,7 +298,9 @@ def get_all_ports(identifier):
                 })
         return jsonify(port_list), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"An error occurred: {e}")
+        print(traceback.format_exc())
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
     finally:
         conn.close()
 
@@ -297,8 +309,7 @@ def get_ports_by_mac(mac_address):
     try:
         formatted_mac = format_mac_address(mac_address)
     except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-    
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500    
     conn = psycopg2.connect(**db_params)
     try:
         with conn.cursor() as cursor:
@@ -334,10 +345,12 @@ def get_ports_by_mac(mac_address):
                 })
         return jsonify(port_list), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"An error occurred: {e}")
+        print(traceback.format_exc())
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
     finally:
         conn.close()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     setup_database()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
