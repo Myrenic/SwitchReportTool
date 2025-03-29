@@ -47,12 +47,45 @@ def is_cisco_device(host, port=22):
         print(traceback.format_exc())
         return False
 
-@app.route('/update_switch', methods=['POST'])
-def update_switch():
+def switch_exists(ip_address):
+    api_url = os.getenv("API_TO_DB") + f"/get_switch/{ip_address}"
+    try:
+        response = requests.get(api_url)
+        return response.status_code == 200
+    except requests.exceptions.RequestException as e:
+        print(f"Error checking switch existence: {e}")
+        print(traceback.format_exc())
+        return False
+
+@app.route('/add_switch', methods=['POST'])
+def add_switch():
     ip_address = request.json.get('ip_address')
+    password = request.json.get('password')
+
     if not ip_address:
         return jsonify({"error": "IP address is required"}), 400
 
+    if not password:
+        return jsonify({"error": "Password is required"}), 400
+
+    if password != os.getenv("API_PASSWORD"):
+        return jsonify({"error": "Invalid password"}), 403
+
+    return process_switch(ip_address)
+
+@app.route('/update_switch', methods=['POST'])
+def update_switch():
+    ip_address = request.json.get('ip_address')
+
+    if not ip_address:
+        return jsonify({"error": "IP address is required"}), 400
+
+    if not switch_exists(ip_address):
+        return jsonify({"error": "Switch not found in the database"}), 404
+
+    return process_switch(ip_address)
+
+def process_switch(ip_address):
     host_data = {
         "device_type": "cisco_ios",
         "host": ip_address,

@@ -7,6 +7,7 @@ import MacFinder from './pages/switch/MacFinder'
 import SwitchInterfaces from './pages/switch/SwitchInterfaces'
 import HomePage from './pages/Index';
 import Switch from './pages/Switch'
+import ReqSwitch from './pages/switch/ReqSwitch';
 
 
 const router = createBrowserRouter([
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
           {
             path: 'switch/mac-finder',
             Component: MacFinder,
+          },
+          {
+            path: 'switch/request',
+            Component: ReqSwitch,
           },
         ],
       },

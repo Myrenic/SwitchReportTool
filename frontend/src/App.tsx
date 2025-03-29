@@ -8,6 +8,7 @@ import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import type { Navigation } from '@toolpad/core/AppProvider';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../theme'; 
+import AddIcon from '@mui/icons-material/Add';
 
 const NAVIGATION: Navigation = [
    {segment: '',
@@ -28,6 +29,11 @@ const NAVIGATION: Navigation = [
         segment: 'switch/mac-finder',
         title: 'Mac Finder',
         icon: <FindInPageIcon />,
+      },
+      {
+        segment: 'switch/request',
+        title: 'Add Switch',
+        icon: <AddIcon />,
       },
 ]
 
