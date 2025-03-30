@@ -1,7 +1,7 @@
 
 
 ### Get All Switches
-GET http://10.115.202.50:5000/
+GET http://localhost:5000/
 
 
 ### Get All Ports
@@ -13,10 +13,10 @@ GET http://localhost:5000/get_latest_ports/10.115.193.50
 
 
 ### Get Switch Data by Hostname
-GET http://10.115.202.50:5000/get_switch/10.115.193.50
+GET http://localhost:5000/get_switch/10.115.193.50
 
 ### Get Switch Data by IP Address
-GET http://10.115.202.50:5000/get_all_switches
+GET http://localhost:5000/get_all_switches
 
 
 ### Call the update_switch API
@@ -32,6 +32,6 @@ POST http://localhost:5001/add_switch
 Content-Type: application/json
 
 {
-  "ip_address": "10.32.1.46",
+  "ip_address": "10.115.193.50",
   "password": "henk"
 }
