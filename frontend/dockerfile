@@ -22,15 +22,8 @@ FROM nginx:alpine
 # Copy the build output from the 'build' stage to the Nginx HTML directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy the entrypoint script into the container
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
 # Expose port 80 to serve the app
 EXPOSE 80
-
-# Set the entrypoint script to inject environment variables into the build files
-ENTRYPOINT ["/entrypoint.sh"]
 
 # Run the Nginx service to serve the app
 CMD ["nginx", "-g", "daemon off;"]
