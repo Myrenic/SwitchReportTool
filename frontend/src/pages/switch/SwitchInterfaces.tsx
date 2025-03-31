@@ -13,9 +13,7 @@ const SwitchInterfaces = () => {
   console.log(`Switch interface debug:
     Envs:
     ${dbUrl}/get_all_switches
-    ${dbUrl}/get_all_switches
-    example route:
-    ${dbUrl}/get_all_switches`);
+    ${ciscoUrl}/update`);
 
 
   const [selectedSwitch, setSelectedSwitch] = useState(null);
@@ -38,8 +36,8 @@ const SwitchInterfaces = () => {
 
   const handleRefresh = () => {
     if (selectedSwitch) {
-      const dbUrl = config.DATABASE_API_URL;
-      fetch(`${dbUrl}/update_switch`, {
+      const ciscoUrl = config.CISCO_API_URL;
+      fetch(`${ciscoUrl}/update_switch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

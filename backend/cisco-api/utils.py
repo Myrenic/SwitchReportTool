@@ -14,7 +14,7 @@ def post_to_api(url, data):
         print(traceback.format_exc())
 
 def switch_exists(ip_address):
-    api_url = os.getenv("API_TO_DB") + f"/get_switch/{ip_address}"
+    api_url = os.getenv("API_TO_DB") + f"/api/db/get_switch/{ip_address}"
     try:
         response = requests.get(api_url)
         return response.status_code == 200

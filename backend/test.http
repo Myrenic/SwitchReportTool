@@ -20,11 +20,11 @@ GET https://nlgro-docker-p1/api/db/get_all_switches
 
 
 ### Call the update_switch API
-POST http://localhost:5001/update_switch
+POST https://nlgro-docker-p1/api/cisco/update_switch
 Content-Type: application/json
 
 {
-  "ip_address": "10.32.1.46"
+  "ip_address": "10.115.193.50"
 }
 
 ### Call the update_switch API
