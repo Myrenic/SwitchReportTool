@@ -4,10 +4,8 @@ FROM node:18-alpine AS build
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the container
+# Copy package files and install dependencies
 COPY package*.json ./
-
-# Install the dependencies
 RUN npm install
 
 # Copy the rest of the application source code to the container
@@ -19,11 +17,19 @@ RUN npm run build
 # Use the official Nginx image to serve the built static files
 FROM nginx:alpine
 
+# Set working directory for Nginx
+WORKDIR /usr/share/nginx/html
+
 # Copy the build output from the 'build' stage to the Nginx HTML directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose port 80 to serve the app
+# Copy the entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Expose port 80
 EXPOSE 80
 
-# Run the Nginx service to serve the app
+# Use entrypoint script to replace environment variables at runtime
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]

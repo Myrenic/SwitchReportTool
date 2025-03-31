@@ -1,7 +1,6 @@
-// src/config.js
 const config = {
-  DATABASE_API_URL: import.meta.env.VITE_REACT_APP_DATABASE_API_URL,
-  CISCO_API_URL: import.meta.env.VITE_REACT_APP_CISCO_API_URL
+  DATABASE_API_URL: "__DATABASE_API_URL__",
+  CISCO_API_URL: "__CISCO_API_URL__"
 };
 
 export default config;
