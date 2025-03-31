@@ -13,6 +13,9 @@ const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
   const [switches, setSwitches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [siteCodes, setSiteCodes] = useState([]);
+  const [selectedSiteCode, setSelectedSiteCode] = useState('');
+  const [filteredSwitches, setFilteredSwitches] = useState([]);
 
   useEffect(() => {
     const dbUrl = config.DATABASE_API_URL;
@@ -21,6 +24,8 @@ const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
       .then(data => {
         if (Array.isArray(data)) {
           setSwitches(data);
+          const uniqueSiteCodes = [...new Set(data.map(sw => sw.hostname.slice(0, 5)))];
+          setSiteCodes(uniqueSiteCodes);
         } else {
           setSwitches([]);
           console.error('Invalid response format:', data);
@@ -32,8 +37,21 @@ const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
       });
   }, []);
 
-  const handleChange = (event) => {
-    const selectedId = parseInt(event.target.value, 10);
+  useEffect(() => {
+    if (selectedSiteCode) {
+      const filtered = switches.filter(sw => sw.hostname.startsWith(selectedSiteCode));
+      setFilteredSwitches(filtered);
+    } else {
+      setFilteredSwitches([]);
+    }
+  }, [selectedSiteCode, switches]);
+
+  const handleSiteCodeChange = (event) => {
+    setSelectedSiteCode(event.target.value);
+  };
+
+  const handleSwitchChange = (event) => {
+    const selectedId = event.target.value;
     const selectedSwitch = switches.find(sw => sw.id === selectedId);
     onSelectSwitch(selectedSwitch);
   };
@@ -71,19 +89,39 @@ const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
       <Typography variant="h6" gutterBottom>
         Select a Switch
       </Typography>
+      <Box className="filter-controls" display="flex" alignItems="center" mb={2}>
+        <FormControl variant="outlined" sx={{ minWidth: 200, marginRight: 2 }}>
+          <InputLabel id="site-code-select-label">Select Site Code</InputLabel>
+          <Select
+            labelId="site-code-select-label"
+            value={selectedSiteCode}
+            onChange={handleSiteCodeChange}
+            label="Select Site Code"
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {siteCodes.map(siteCode => (
+              <MenuItem key={siteCode} value={siteCode}>
+                {siteCode}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
       <Box className="switch-list-controls" display="flex" alignItems="center">
         <FormControl variant="outlined" sx={{ minWidth: 200, marginRight: 2 }}>
           <InputLabel id="switch-select-label">Select a switch</InputLabel>
           <Select
             labelId="switch-select-label"
             value={selectedSwitch ? selectedSwitch.id : ""}
-            onChange={handleChange}
+            onChange={handleSwitchChange}
             label="Select a switch"
           >
             <MenuItem value="">
               <em>None</em>
             </MenuItem>
-            {switches.map((sw) => (
+            {filteredSwitches.map(sw => (
               <MenuItem key={sw.id} value={sw.id}>
                 {sw.hostname}
               </MenuItem>
