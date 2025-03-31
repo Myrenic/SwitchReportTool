@@ -105,7 +105,7 @@ def initialize_routes(app):
             }
 
             # Post combined data to API
-            api_url = os.getenv("API_TO_DB") + "/store_data"
+            api_url = os.getenv("API_TO_DB") + "/api/db/store_data"
             post_to_api(api_url, combined_data)
             
             return jsonify({"message": "Data updated successfully","data": combined_data}), 200
