@@ -15,7 +15,28 @@ import {
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
+// Custom comparator for port names
+const portNameComparator = (a, b) => {
+  const parsePortName = (name) => {
+    const match = name.match(/([a-zA-Z]+)(\d+)\/(\d+)\/(\d+)/);
+    if (!match) return [name];
+    return [match[1], parseInt(match[2]), parseInt(match[3]), parseInt(match[4])];
+  };
+
+  const aParsed = parsePortName(a);
+  const bParsed = parsePortName(b);
+
+  for (let i = 0; i < aParsed.length; i++) {
+    if (aParsed[i] < bParsed[i]) return -1;
+    if (aParsed[i] > bParsed[i]) return 1;
+  }
+  return 0;
+};
+
 const descendingComparator = (a, b, orderBy) => {
+  if (orderBy === 'port') {
+    return portNameComparator(b[orderBy], a[orderBy]);
+  }
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
