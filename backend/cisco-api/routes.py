@@ -5,7 +5,7 @@ from device_handlers import run_cisco_commands, is_cisco_device
 
 def initialize_routes(app):
 
-    @app.route('/add_switch', methods=['POST'])
+    @app.route('/api/cisco/add_switch', methods=['POST'])
     def add_switch():
         ip_address = request.json.get('ip_address')
         password = request.json.get('password')
@@ -24,7 +24,7 @@ def initialize_routes(app):
 
         return process_switch(ip_address)
 
-    @app.route('/update_switch', methods=['POST'])
+    @app.route('/api/cisco/update_switch', methods=['POST'])
     def update_switch():
         ip_address = request.json.get('ip_address')
 

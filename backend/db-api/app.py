@@ -92,7 +92,7 @@ def format_mac_address(mac):
     # Convert to e430.2250.abf3 format
     return f'{mac[0:4]}.{mac[4:8]}.{mac[8:12]}'
 
-@app.route('/store_data', methods=['POST'])
+@app.route('/api/db/api/db/store_data', methods=['POST'])
 def store_data():
     data = request.json
 
@@ -140,7 +140,7 @@ def store_data():
     finally:
         conn.close()
 
-@app.route('/get_all_switches', methods=['GET'])
+@app.route('/api/db/get_all_switches', methods=['GET'])
 def get_all_switches():
     conn = psycopg2.connect(**db_params)
     try:
@@ -165,7 +165,7 @@ def get_all_switches():
     finally:
         conn.close()
 
-@app.route('/get_latest_ports/<identifier>', methods=['GET'])
+@app.route('/api/db/get_latest_ports/<identifier>', methods=['GET'])
 def get_latest_ports(identifier):
     conn = psycopg2.connect(**db_params)
     try:
@@ -220,7 +220,7 @@ def get_latest_ports(identifier):
     finally:
         conn.close()
 
-@app.route('/get_switch/<identifier>', methods=['GET'])
+@app.route('/api/db/get_switch/<identifier>', methods=['GET'])
 def get_switch(identifier):
     conn = psycopg2.connect(**db_params)
     try:
@@ -250,7 +250,7 @@ def get_switch(identifier):
     finally:
         conn.close()
 
-@app.route('/get_all_ports/<identifier>', methods=['GET'])
+@app.route('/api/db/get_all_ports/<identifier>', methods=['GET'])
 def get_all_ports(identifier):
     conn = psycopg2.connect(**db_params)
     try:
@@ -304,7 +304,7 @@ def get_all_ports(identifier):
     finally:
         conn.close()
 
-@app.route('/get_ports_by_mac/<mac_address>', methods=['GET'])
+@app.route('/api/db/get_ports_by_mac/<mac_address>', methods=['GET'])
 def get_ports_by_mac(mac_address):
     try:
         formatted_mac = format_mac_address(mac_address)
