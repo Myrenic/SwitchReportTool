@@ -6,9 +6,18 @@ import SwitchPorts from '../../components/SwitchPorts';
 import AddSwitch from '../../components/AddSwitch';
 import config from '../../config'; 
 
-console.log(config.CISCO_API_URL);
 
 const SwitchInterfaces = () => {
+  const dbUrl = config.DATABASE_API_URL;
+  const ciscoUrl = config.CISCO_API_URL;
+  console.log(`Switch interface debug:
+    Envs:
+    ${dbUrl}/get_all_switches
+    ${dbUrl}/get_all_switches
+    example route:
+    ${dbUrl}/get_all_switches`);
+
+
   const [selectedSwitch, setSelectedSwitch] = useState(null);
   const [switchPorts, setSwitchPorts] = useState([]);
   const [refreshMessage, setRefreshMessage] = useState('');
