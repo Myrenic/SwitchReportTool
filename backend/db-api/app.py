@@ -92,7 +92,7 @@ def format_mac_address(mac):
     # Convert to e430.2250.abf3 format
     return f'{mac[0:4]}.{mac[4:8]}.{mac[8:12]}'
 
-@app.route('/api/db/api/db/store_data', methods=['POST'])
+@app.route('/api/db/store_data', methods=['POST'])
 def store_data():
     data = request.json
 
