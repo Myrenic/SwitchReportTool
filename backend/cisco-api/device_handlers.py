@@ -9,19 +9,24 @@ def is_cisco_device(host, port=22):
         sock.close()
         return "Cisco" in banner
     except Exception as e:
-        print(f"Error connecting to {host}: {e}")
-        print(traceback.format_exc())
+        print(f"Error connecting to {host}")
         return False
 
 def run_cisco_commands(host_data, commands):
+    output = {}
+    if not is_cisco_device(host_data['host']):
+        return (f"Not a cisco device")
     try:
-        if is_cisco_device(host_data['host']):
-            with ConnectHandler(**host_data) as net_connect:
-                output = {}
-                for command in commands:
-                    output[command] = net_connect.send_command(command, use_textfsm=True)
-                return output
+        net_connect = ConnectHandler(**host_data)
+        for command in commands:
+            try:
+                output[command] = net_connect.send_command(command, use_textfsm=True)
+            except Exception as e:
+                print(f"Error executing command {command}: {e}")
+                output[command] = "N/A"
     except Exception as e:
-        print(f"Error posting to Cisco: {e}")
-        print(traceback.format_exc())
-        return {}
+        print(f"Connection error: {e}")
+        output = {command: "N/A" for command in commands}
+    finally:
+        net_connect.disconnect()
+    return output

@@ -9,11 +9,11 @@ GET http://localhost:5000/get_all_ports/NLGRO-B1-MERA-LAN06
 
 
 ### Get Latest Ports for a Specific Switch
-GET http://localhost:5000/get_latest_ports/10.115.193.50
+GET http://localhost:5000/api/db/get_latest_ports/10.115.193.50
 
 
 ### Get Switch Data by Hostname
-GET http://localhost:5000/get_switch/10.115.193.50
+GET http://localhost:5000/api/db/get_switch/10.115.193.50
 
 ### Get Switch Data by IP Address
 GET https://nlgro-docker-p1/api/db/get_all_switches
@@ -28,7 +28,7 @@ Content-Type: application/json
 }
 
 ### Call the update_switch API
-POST https://nlgro-docker-p1/api/cisco/add_switch
+POST http://localhost:5001/api/cisco/add_switch
 Content-Type: application/json
 
 {

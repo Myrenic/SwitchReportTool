@@ -45,39 +45,53 @@ def initialize_routes(app):
         }
 
         commands = ["show interfaces status", "show mac address-table", "show version", "show arp", "show lldp neighbors detail"]
-        output = run_cisco_commands(host_data, commands)
+
+        try:
+            output = run_cisco_commands(host_data, commands)
+        except Exception as e:
+            print(f"Error running commands: {e}")
+            return jsonify({"error": "Failed to run commands on the switch"}), 500
 
         if output:
-            interfaces_status = output["show interfaces status"]
-            mac_address_table = output["show mac address-table"]
-            switch_version = output["show version"][0]
-            arp_table = output["show arp"]
-            lldp_neighbors = output["show lldp neighbors detail"]
+            try:
+                interfaces_status = output.get("show interfaces status", [])
+                mac_address_table = output.get("show mac address-table", [])
+                switch_version = output.get("show version", [{}])[0]
+                arp_table = output.get("show arp", [])
+                lldp_neighbors = output.get("show lldp neighbors detail", [])
+                
+                # Ensure lldp_neighbors is a list
+                if isinstance(lldp_neighbors, str):
+                    lldp_neighbors = []
+                
+            except Exception as e:
+                print(f"Error processing output: {e}")
+                return jsonify({"error": "Failed to process switch data"}), 500
 
             switch_stats = {
-                "uptime": switch_version['uptime'],
-                "hostname": switch_version['hostname'],
+                "uptime": switch_version.get('uptime', 'N/A'),
+                "hostname": switch_version.get('hostname', 'N/A'),
                 "ip_address": host_data['host'],
-                "hardware": switch_version['hardware'],
-                "serial": switch_version['serial'],
-                "mac_address": switch_version['mac_address']
+                "hardware": switch_version.get('hardware', 'N/A'),
+                "serial": switch_version.get('serial', 'N/A'),
+                "mac_address": switch_version.get('mac_address', 'N/A')
             }
 
             interface_stats = []
 
             for port_info in interfaces_status:
                 combined_entry = port_info.copy()  # Start with the interface data
-                port = port_info['port']
+                port = port_info.get('port', 'N/A')
 
                 # Find the corresponding MAC address for this port
-                mac_info = next((mac for mac in mac_address_table if port in mac['destination_port']), None)
+                mac_info = next((mac for mac in mac_address_table if port in mac.get('destination_port', [])), None)
                 if mac_info:
-                    combined_entry['mac_address'] = mac_info['destination_address']
+                    combined_entry['mac_address'] = mac_info.get('destination_address', 'N/A')
                     
                     # Find the corresponding IP address for this MAC
-                    arp_info = next((arp for arp in arp_table if arp['hardware_address'] == mac_info['destination_address']), None)
+                    arp_info = next((arp for arp in arp_table if arp.get('hardware_address') == mac_info.get('destination_address')), None)
                     if arp_info:
-                        combined_entry['ip_address'] = arp_info['address']
+                        combined_entry['ip_address'] = arp_info.get('address', 'N/A')
                     else:
                         combined_entry['ip_address'] = 'N/A'
                 else:
@@ -85,17 +99,17 @@ def initialize_routes(app):
                     combined_entry['ip_address'] = 'N/A'
 
                 # Find the corresponding LLDP neighbor for this port
-                lldp_info = next((lldp for lldp in lldp_neighbors if lldp['local_interface'] == port), None)
+                lldp_info = next((lldp for lldp in lldp_neighbors if lldp.get('local_interface') == port), None)
                 if lldp_info:
                     combined_entry['lldp_neighbor'] = lldp_info.get('neighbor_interface', '')
-                    combined_entry['lldp_neighbor_device'] = lldp_info.get('neighbor_name', '')
+                    combined_entry['lldp_neighbor_device'] = lldp_info.get('neighbor_name') or lldp_info.get('chassis_id', '')
                     combined_entry['lldp_neighbor_mgmt_ip'] = lldp_info.get('mgmt_address', '')
                 else:
                     combined_entry['lldp_neighbor'] = ''
                     combined_entry['lldp_neighbor_device'] = ''
                     combined_entry['lldp_neighbor_mgmt_ip'] = ''
 
-                combined_entry['switch_name'] = switch_version['hostname']
+                combined_entry['switch_name'] = switch_version.get('hostname', 'N/A')
 
                 interface_stats.append(combined_entry)
 
@@ -107,7 +121,7 @@ def initialize_routes(app):
             # Post combined data to API
             api_url = os.getenv("API_TO_DB") + "/api/db/store_data"
             post_to_api(api_url, combined_data)
-            
-            return jsonify({"message": "Data updated successfully","data": combined_data}), 200
+
+            return jsonify({"message": "Data updated successfully", "data": combined_data}), 200
 
         return jsonify({"error": "Failed to retrieve switch data"}), 500
