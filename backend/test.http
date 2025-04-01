@@ -20,7 +20,7 @@ GET https://nlgro-docker-p1/api/db/get_all_switches
 
 
 ### Call the update_switch API
-POST https://nlgro-docker-p1/api/cisco/update_switch
+POST http://127.0.0.1:5001/api/update_switch
 Content-Type: application/json
 
 {
@@ -28,10 +28,20 @@ Content-Type: application/json
 }
 
 ### Call the update_switch API
-POST http://localhost:5001/api/cisco/add_switch
+POST http://127.0.0.1:5001/api/cisco/add_switch
 Content-Type: application/json
 
 {
-  "ip_address": "10.115.193.50",
-  "password": "henk"
+  "ip_address": "10.115.193.254",
+  "password": "henk",
+  "platform": "arista_eos"
+}
+###
+POST http://127.0.0.1:5001/api/cisco/add_switch
+Content-Type: application/json
+
+{
+  "ip_address": "10.115.193.47",
+  "password": "henk",
+  "platform": "cisco_ios"
 }

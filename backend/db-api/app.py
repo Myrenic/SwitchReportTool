@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS master_switch_stats (
     ip_address VARCHAR(50),
     hardware VARCHAR(255)[],
     serial VARCHAR(255)[],
-    mac_address VARCHAR(255)[]
+    mac_address VARCHAR(255)[],
+    platform VARCHAR(50) NOT NULL
 );
 """
 
@@ -95,28 +96,34 @@ def format_mac_address(mac):
 @app.route('/api/db/store_data', methods=['POST'])
 def store_data():
     data = request.json
-
+    
     switch_stats = data.get('switch_stats')
     interface_stats = data.get('interface_stats')
+    platform = switch_stats.get('device_type')
+
     
+
     if not switch_stats or not interface_stats:
         return jsonify({"error": "Invalid data format"}), 400
 
+    if not platform or len(platform) > 20:
+        return jsonify({"error": "Platform is required and should be a string of up to 20 characters."}), 400
     conn = psycopg2.connect(**db_params)
     conn.autocommit = True
     try:
         with conn.cursor() as cursor:
             # Insert into master_switch_stats
             cursor.execute("""
-                INSERT INTO master_switch_stats (hostname, ip_address, hardware, serial, mac_address)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO master_switch_stats (hostname, ip_address, hardware, serial, mac_address, platform)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT (hostname) DO UPDATE SET
                 ip_address = EXCLUDED.ip_address,
                 hardware = EXCLUDED.hardware,
                 serial = EXCLUDED.serial,
-                mac_address = EXCLUDED.mac_address
+                mac_address = EXCLUDED.mac_address,
+                platform = EXCLUDED.platform
                 RETURNING id;
-            """, (switch_stats['hostname'], switch_stats['ip_address'], switch_stats['hardware'], switch_stats['serial'], switch_stats['mac_address']))
+            """, (switch_stats['hostname'], switch_stats['ip_address'], switch_stats['hardware'], switch_stats['serial'], switch_stats['mac_address'], switch_stats.get('device_type')))
             switch_id = cursor.fetchone()[0]
             
             # Insert into historical_switch_stats
@@ -155,7 +162,8 @@ def get_all_switches():
                     "ip_address": switch[2],
                     "hardware": switch[3],
                     "serial": switch[4],
-                    "mac_address": switch[5]
+                    "mac_address": switch[5],
+                    "platform": switch[6]
                 })
         return jsonify(switch_list), 200
     except Exception as e:
@@ -240,7 +248,8 @@ def get_switch(identifier):
                 "ip_address": switch[2],
                 "hardware": switch[3],
                 "serial": switch[4],
-                "mac_address": switch[5]
+                "mac_address": switch[5],
+                "platform": switch[6]
             }
         return jsonify(switch_data), 200
     except Exception as e:
