@@ -7,7 +7,8 @@ from routes import initialize_routes
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 initialize_routes(app)
 
 if __name__ == "__main__":

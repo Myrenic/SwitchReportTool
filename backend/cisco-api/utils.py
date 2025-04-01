@@ -22,3 +22,19 @@ def switch_exists(ip_address):
         print(f"Error checking switch existence: {e}")
         print(traceback.format_exc())
         return False
+
+def switch_platform(ip_address):
+    api_url = os.getenv("API_TO_DB") + f"/api/db/get_switch/{ip_address}"
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()  
+        data = response.json()
+        return data.get("platform")
+    except requests.exceptions.RequestException as e:
+        print(f"Error checking switch existence: {e}")
+        print(traceback.format_exc())
+        return None
+    except ValueError as e:
+        print(f"Error parsing JSON response: {e}")
+        print(traceback.format_exc())
+        return None

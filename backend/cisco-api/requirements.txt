@@ -1,5 +1,0 @@
-python-dotenv
-netmiko
-requests
-flask
-flask-cors

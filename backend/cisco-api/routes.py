@@ -1,7 +1,8 @@
 import os
 from flask import request, jsonify
-from utils import post_to_api, switch_exists
-from device_handlers import run_cisco_commands, is_cisco_device
+from utils import post_to_api, switch_exists, switch_platform
+from device_handlers.cisco_handler import run_cisco_commands, is_cisco_device, process_cisco_output
+from device_handlers.arista_handler import run_arista_commands, is_arista_device, process_arista_output
 
 def initialize_routes(app):
 
@@ -9,7 +10,8 @@ def initialize_routes(app):
     def add_switch():
         ip_address = request.json.get('ip_address')
         password = request.json.get('password')
-
+        platform = request.json.get('platform')
+ 
         if not ip_address:
             return jsonify({"error": "IP address is required"}), 400
 
@@ -19,10 +21,17 @@ def initialize_routes(app):
         if password != os.getenv("API_PASSWORD"):
             return jsonify({"error": "Invalid password"}), 403
 
-        if not is_cisco_device(ip_address):
-            return jsonify({"error": "Not a Cisco device"}), 400
+        if not platform:
+            return jsonify({"error": "Platform is required"}), 400
 
-        return process_switch(ip_address)
+        if platform == "cisco_ios" and is_cisco_device(ip_address):
+            return process_switch(ip_address, platform)
+        # elif platform == "arista_eos" and is_arista_device(ip_address):
+        elif platform == "arista_eos":
+
+            return process_switch(ip_address, platform)
+        else:
+            return jsonify({"error": "Unsupported device type or incorrect platform"}), 400
 
     @app.route('/api/cisco/update_switch', methods=['POST'])
     def update_switch():
@@ -34,94 +43,49 @@ def initialize_routes(app):
         if not switch_exists(ip_address):
             return jsonify({"error": "Switch not found in the database"}), 404
 
-        return process_switch(ip_address)
+        platform = switch_platform(ip_address)
+        print(platform)
+        if not platform:
+            return jsonify({"error": "Platform is required"}), 400
+    
+        if platform == "cisco_ios" and is_cisco_device(ip_address):
+            return process_switch(ip_address, platform)
+        # elif platform == "arista_eos" and is_arista_device(ip_address):
+        elif platform == "arista_eos":
+            return process_switch(ip_address, platform)
+        else:
+            return jsonify({"error": "Unsupported device type or incorrect platform"}), 400
 
-    def process_switch(ip_address):
+    def process_switch(ip_address, platform):
         host_data = {
-            "device_type": "cisco_ios",
             "host": ip_address,
             "username": os.getenv("HOST_USERNAME"),
             "password": os.getenv("HOST_PASSWORD"),
+            "device_type": platform,
+            
         }
 
-        commands = ["show interfaces status", "show mac address-table", "show version", "show arp", "show lldp neighbors detail"]
+        if platform == "cisco_ios":
+            commands = ["show interfaces status", "show mac address-table", "show version", "show arp", "show lldp neighbors detail"]
+            output = run_cisco_commands(host_data, commands)
+            processed_data = process_cisco_output(output, host_data)
+        elif platform == "arista_eos":
+            commands = ["show interfaces status", "show mac address-table", "show version", "show arp", "show lldp neighbors detail", "show hostname"]
+            output = run_arista_commands(host_data, commands)
+            processed_data = process_arista_output(output, host_data)
+        else:
+            return jsonify({"error": "Unsupported device type"}), 400
+
+        if isinstance(output, str):
+            return jsonify({"error": output}), 400
 
         try:
-            output = run_cisco_commands(host_data, commands)
-        except Exception as e:
-            print(f"Error running commands: {e}")
-            return jsonify({"error": "Failed to run commands on the switch"}), 500
-
-        if output:
-            try:
-                interfaces_status = output.get("show interfaces status", [])
-                mac_address_table = output.get("show mac address-table", [])
-                switch_version = output.get("show version", [{}])[0]
-                arp_table = output.get("show arp", [])
-                lldp_neighbors = output.get("show lldp neighbors detail", [])
-                
-                # Ensure lldp_neighbors is a list
-                if isinstance(lldp_neighbors, str):
-                    lldp_neighbors = []
-                
-            except Exception as e:
-                print(f"Error processing output: {e}")
-                return jsonify({"error": "Failed to process switch data"}), 500
-
-            switch_stats = {
-                "uptime": switch_version.get('uptime', 'N/A'),
-                "hostname": switch_version.get('hostname', 'N/A'),
-                "ip_address": host_data['host'],
-                "hardware": switch_version.get('hardware', 'N/A'),
-                "serial": switch_version.get('serial', 'N/A'),
-                "mac_address": switch_version.get('mac_address', 'N/A')
-            }
-
-            interface_stats = []
-
-            for port_info in interfaces_status:
-                combined_entry = port_info.copy()  # Start with the interface data
-                port = port_info.get('port', 'N/A')
-
-                # Find the corresponding MAC address for this port
-                mac_info = next((mac for mac in mac_address_table if port in mac.get('destination_port', [])), None)
-                if mac_info:
-                    combined_entry['mac_address'] = mac_info.get('destination_address', 'N/A')
-                    
-                    # Find the corresponding IP address for this MAC
-                    arp_info = next((arp for arp in arp_table if arp.get('hardware_address') == mac_info.get('destination_address')), None)
-                    if arp_info:
-                        combined_entry['ip_address'] = arp_info.get('address', 'N/A')
-                    else:
-                        combined_entry['ip_address'] = 'N/A'
-                else:
-                    combined_entry['mac_address'] = 'N/A'
-                    combined_entry['ip_address'] = 'N/A'
-
-                # Find the corresponding LLDP neighbor for this port
-                lldp_info = next((lldp for lldp in lldp_neighbors if lldp.get('local_interface') == port), None)
-                if lldp_info:
-                    combined_entry['lldp_neighbor'] = lldp_info.get('neighbor_interface', '')
-                    combined_entry['lldp_neighbor_device'] = lldp_info.get('neighbor_name') or lldp_info.get('chassis_id', '')
-                    combined_entry['lldp_neighbor_mgmt_ip'] = lldp_info.get('mgmt_address', '')
-                else:
-                    combined_entry['lldp_neighbor'] = ''
-                    combined_entry['lldp_neighbor_device'] = ''
-                    combined_entry['lldp_neighbor_mgmt_ip'] = ''
-
-                combined_entry['switch_name'] = switch_version.get('hostname', 'N/A')
-
-                interface_stats.append(combined_entry)
-
-            combined_data = {
-                "switch_stats": switch_stats,
-                "interface_stats": interface_stats
-            }
-
             # Post combined data to API
             api_url = os.getenv("API_TO_DB") + "/api/db/store_data"
-            post_to_api(api_url, combined_data)
+            post_to_api(api_url, processed_data)
 
-            return jsonify({"message": "Data updated successfully", "data": combined_data}), 200
+            return jsonify({"message": "Data updated successfully", "data": processed_data}), 200
 
-        return jsonify({"error": "Failed to retrieve switch data"}), 500
+        except Exception as e:
+            print(f"Error processing output: {e}")
+            return jsonify({"error": "Failed to process switch data"}), 500

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, CircularProgress, Container, Paper } from '@mui/material';
+import { TextField, Button, Box, Typography, CircularProgress, Container, Paper, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import config from '../config'; // Ensure you have your config file to get API URL
 
 const AddSwitch = () => {
   const [switchIp, setSwitchIp] = useState('');
   const [password, setPassword] = useState('');
+  const [platform, setPlatform] = useState('cisco_ios');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageColor, setMessageColor] = useState('error'); // To handle message color
@@ -20,7 +21,7 @@ const AddSwitch = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ip_address: switchIp, password }),
+        body: JSON.stringify({ ip_address: switchIp, password, platform }),
       });
 
       const data = await response.json();
@@ -29,7 +30,7 @@ const AddSwitch = () => {
         setMessage('Switch added successfully!');
         setMessageColor('primary'); // Success message color
       } else {
-        setMessage(data.error || 'Failed to add switch. Please check the IP and password.');
+        setMessage(data.error || 'Failed to add switch. Please check the IP, password, and platform.');
         setMessageColor('error'); // Error message color
       }
     } catch (error) {
@@ -70,6 +71,20 @@ const AddSwitch = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+              </Box>
+              <Box mb={2}>
+                <FormControl fullWidth variant="outlined">
+                  <InputLabel>Platform</InputLabel>
+                  <Select
+                    value={platform}
+                    onChange={(e) => setPlatform(e.target.value)}
+                    label="Platform"
+                    required
+                  >
+                    <MenuItem value="cisco_ios">Cisco IOS</MenuItem>
+                    <MenuItem value="arista_eos">Arista EOS</MenuItem>
+                  </Select>
+                </FormControl>
               </Box>
               <Box mb={2} display="flex" justifyContent="center">
                 <Button
