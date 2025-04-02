@@ -23,6 +23,12 @@ const SwitchDetails = ({ switch: selectedSwitch }) => {
       <Typography variant="body1">
         <strong>Serial:</strong> {selectedSwitch.serial.join(', ')}
       </Typography>
+      <Typography variant="body1">
+        <strong>Latest Uptime:</strong> {selectedSwitch.latest_uptime || 'N/A'}
+      </Typography>
+      <Typography variant="body1">
+        <strong>Uptime Timestamp:</strong> {selectedSwitch.uptime_timestamp || 'N/A'}
+      </Typography>
     </Box>
   );
 };

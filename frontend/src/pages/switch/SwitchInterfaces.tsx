@@ -4,8 +4,7 @@ import SwitchList from '../../components/SwitchLists';
 import SwitchDetails from '../../components/SwitchDetails';
 import SwitchPorts from '../../components/SwitchPorts';
 import AddSwitch from '../../components/AddSwitch';
-import config from '../../config'; 
-
+import config from '../../config';
 
 const SwitchInterfaces = () => {
   const dbUrl = config.DATABASE_API_URL;
@@ -14,7 +13,6 @@ const SwitchInterfaces = () => {
     Envs:
     ${dbUrl}/get_all_switches
     ${ciscoUrl}/update`);
-
 
   const [selectedSwitch, setSelectedSwitch] = useState(null);
   const [switchPorts, setSwitchPorts] = useState([]);
@@ -29,14 +27,20 @@ const SwitchInterfaces = () => {
       .catch(error => console.error('Error fetching switch ports:', error));
   };
 
+  const fetchSwitchDetails = (identifier) => {
+    fetch(`${dbUrl}/get_switch/${identifier}`)
+      .then(response => response.json())
+      .then(data => setSelectedSwitch(data))
+      .catch(error => console.error('Error fetching switch details:', error));
+  };
+
   const handleSelectSwitch = (sw) => {
-    setSelectedSwitch(sw);
+    fetchSwitchDetails(sw.hostname);
     fetchSwitchPorts(sw.hostname);
   };
 
   const handleRefresh = () => {
     if (selectedSwitch) {
-      const ciscoUrl = config.CISCO_API_URL;
       fetch(`${ciscoUrl}/update_switch`, {
         method: 'POST',
         headers: {
@@ -48,6 +52,7 @@ const SwitchInterfaces = () => {
         .then(data => {
           setRefreshMessage(data.message);
           fetchSwitchPorts(selectedSwitch.hostname);
+          fetchSwitchDetails(selectedSwitch.hostname); // Refresh switch details
         })
         .catch(error => console.error('Error refreshing switch:', error));
     }

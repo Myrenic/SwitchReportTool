@@ -101,8 +101,6 @@ def store_data():
     interface_stats = data.get('interface_stats')
     platform = switch_stats.get('device_type')
 
-    
-
     if not switch_stats or not interface_stats:
         return jsonify({"error": "Invalid data format"}), 400
 
@@ -251,6 +249,18 @@ def get_switch(identifier):
                 "mac_address": switch[5],
                 "platform": switch[6]
             }
+
+            # Get the latest uptime data
+            cursor.execute("""
+                SELECT uptime, timestamp FROM historical_switch_stats
+                WHERE switch_id = %s
+                ORDER BY timestamp DESC LIMIT 1;
+            """, (switch_data["id"],))
+            uptime_data = cursor.fetchone()
+            if uptime_data:
+                switch_data["latest_uptime"] = uptime_data[0]
+                switch_data["uptime_timestamp"] = uptime_data[1]
+
         return jsonify(switch_data), 200
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -318,7 +328,7 @@ def get_ports_by_mac(mac_address):
     try:
         formatted_mac = format_mac_address(mac_address)
     except ValueError as e:
-        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500    
+        return jsonify({"error": "Invalid MAC address format"}), 400    
     conn = psycopg2.connect(**db_params)
     try:
         with conn.cursor() as cursor:
