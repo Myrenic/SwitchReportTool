@@ -15,7 +15,11 @@ class CustomAristaSSH(AristaSSH):
         self._test_channel_read()
         self.set_base_prompt()
 
-
+def normalize_interface_name(interface):
+    # Convert "EthernetX" to "EtX"
+    if interface.lower().startswith('ethernet'):
+        return 'et' + interface[8:]
+    return interface
 
 def is_arista_device(host, port=22):
     # Implement Arista device detection logic
@@ -115,8 +119,15 @@ def process_arista_output(output, host_data):
         else:
             combined_entry['mac_address'] = 'N/A'
             combined_entry['ip_address'] = 'N/A'
+        for lldp in lldp_neighbors:
+            normalized_local_interface = normalize_interface_name(lldp['local_interface'])
+            normalized_port = normalize_interface_name(port)
+            if normalized_local_interface == normalized_port:
+                lldp_info = lldp
+                break
+        else:
+            lldp_info = None
 
-        lldp_info = next((lldp for lldp in lldp_neighbors if lldp['local_interface'] == port), None)
         if lldp_info:
             combined_entry['lldp_neighbor'] = lldp_info.get('neighbor_interface', '')
             combined_entry['lldp_neighbor_device'] = lldp_info.get('neighbor_name', '')
