@@ -7,12 +7,13 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import IconButton from '@mui/material/IconButton';
 import config from '../config'; // Ensure you have your config file to get API URL
 
-const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
+const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh, onUpdate, setStatusMessage }) => {
   const [switches, setSwitches] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [siteCodes, setSiteCodes] = useState([]);
   const [selectedSiteCode, setSelectedSiteCode] = useState('');
   const [filteredSwitches, setFilteredSwitches] = useState([]);
@@ -58,12 +59,12 @@ const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
 
   const handleUpdate = () => {
     if (!selectedSwitch) {
-      setMessage('Please select a switch to update.');
+      setStatusMessage('Please select a switch to update.');
       return;
     }
 
     setLoading(true);
-    setMessage('');
+    setStatusMessage('');
 
     fetch(`${config.CISCO_API_URL}/update_switch`, {
       method: 'POST',
@@ -75,11 +76,12 @@ const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
       .then(response => response.json())
       .then(data => {
         setLoading(false);
-        setMessage(data.message || 'Switch updated successfully.');
+        setStatusMessage(data.message || 'Switch updated successfully.');
+        onRefresh(); // Refresh data after updating
       })
       .catch(error => {
         setLoading(false);
-        setMessage('Error updating switch. Please try again.');
+        setStatusMessage('Error updating switch. Please try again.');
         console.error('Error updating switch:', error);
       });
   };
@@ -128,14 +130,9 @@ const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
             ))}
           </Select>
         </FormControl>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={onRefresh}
-          sx={{ marginRight: 2 }}
-        >
-          Refresh
-        </Button>
+        <IconButton onClick={onRefresh} disabled={loading} sx={{ marginRight: 2 }}>
+          <RefreshIcon />
+        </IconButton>
         <Button
           variant="contained"
           color="secondary"
@@ -145,11 +142,6 @@ const SwitchList = ({ selectedSwitch, onSelectSwitch, onRefresh }) => {
           {loading ? <CircularProgress size={24} /> : 'Update'}
         </Button>
       </Box>
-      {message && (
-        <Typography variant="body2" color="textSecondary" sx={{ marginTop: 2 }}>
-          {message}
-        </Typography>
-      )}
     </Box>
   );
 };

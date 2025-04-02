@@ -1,26 +1,17 @@
 import React, { useState } from 'react';
-import Typography from '@mui/material/Typography';
 import SwitchList from '../../components/SwitchLists';
 import SwitchDetails from '../../components/SwitchDetails';
 import SwitchPorts from '../../components/SwitchPorts';
-import AddSwitch from '../../components/AddSwitch';
 import config from '../../config';
 
 const SwitchInterfaces = () => {
   const dbUrl = config.DATABASE_API_URL;
-  const ciscoUrl = config.CISCO_API_URL;
-  console.log(`Switch interface debug:
-    Envs:
-    ${dbUrl}/get_all_switches
-    ${ciscoUrl}/update`);
 
   const [selectedSwitch, setSelectedSwitch] = useState(null);
   const [switchPorts, setSwitchPorts] = useState([]);
-  const [refreshMessage, setRefreshMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
 
   const fetchSwitchPorts = (hostname) => {
-    const dbUrl = config.DATABASE_API_URL;
-
     fetch(`${dbUrl}/get_latest_ports/${hostname}`)
       .then(response => response.json())
       .then(data => setSwitchPorts(data))
@@ -35,13 +26,35 @@ const SwitchInterfaces = () => {
   };
 
   const handleSelectSwitch = (sw) => {
+    setSelectedSwitch(null); // Clear previous selection while fetching new data
     fetchSwitchDetails(sw.hostname);
     fetchSwitchPorts(sw.hostname);
   };
 
   const handleRefresh = () => {
     if (selectedSwitch) {
-      fetch(`${ciscoUrl}/update_switch`, {
+      setStatusMessage('Refreshing data...');
+      Promise.all([
+        fetchSwitchDetails(selectedSwitch.hostname),
+        fetchSwitchPorts(selectedSwitch.hostname)
+      ])
+      .then(() => {
+        setStatusMessage('Data refreshed successfully');
+      })
+      .catch(error => {
+        console.error('Error refreshing ', error);
+        setStatusMessage('Error refreshing data');
+      })
+      .finally(() => {
+        setTimeout(() => setStatusMessage(''), 3000); // Clear the message after 3 seconds
+      });
+    }
+  };
+
+  const handleUpdate = () => {
+    if (selectedSwitch) {
+      setStatusMessage('Updating switch data...');
+      fetch(`${config.CISCO_API_URL}/update_switch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,11 +63,16 @@ const SwitchInterfaces = () => {
       })
         .then(response => response.json())
         .then(data => {
-          setRefreshMessage(data.message);
-          fetchSwitchPorts(selectedSwitch.hostname);
-          fetchSwitchDetails(selectedSwitch.hostname); // Refresh switch details
+          setStatusMessage(data.message || 'Switch updated successfully.');
+          handleRefresh(); // Refresh data after updating
         })
-        .catch(error => console.error('Error refreshing switch:', error));
+        .catch(error => {
+          console.error('Error updating switch:', error);
+          setStatusMessage('Error updating switch');
+        })
+        .finally(() => {
+          setTimeout(() => setStatusMessage(''), 3000); // Clear the message after 3 seconds
+        });
     }
   };
 
@@ -66,10 +84,12 @@ const SwitchInterfaces = () => {
             selectedSwitch={selectedSwitch}
             onSelectSwitch={handleSelectSwitch}
             onRefresh={handleRefresh}
+            onUpdate={handleUpdate}
+            setStatusMessage={setStatusMessage}
           />
         </div>
       </div>
-      {refreshMessage && <p className="refresh-message">{refreshMessage}</p>}
+      {statusMessage && <p className="status-message">{statusMessage}</p>}
       <div className="content">
         <div className="box">
           {selectedSwitch ? (
@@ -86,9 +106,6 @@ const SwitchInterfaces = () => {
           <div className="placeholder">No ports to display</div>
         )}
       </div>
-      {/* <div className="box add-switch">
-        <AddSwitch />
-      </div> */}
     </div>
   );
 };
