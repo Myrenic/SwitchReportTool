@@ -6,7 +6,9 @@ import psycopg2
 from psycopg2 import sql
 from flask_cors import CORS
 import re
-
+import json
+import requests
+from collections import defaultdict
 load_dotenv()
 
 app = Flask(__name__)
@@ -64,6 +66,118 @@ CREATE TABLE IF NOT EXISTS historical_interface_stats (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
+
+
+# Function to fetch data from the API
+def fetch_data(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Failed to fetch data from {url}: {response.status_code}")
+        return None
+def generate_network_tree(initial_url):
+    data = fetch_data(initial_url)
+    if data:
+        true_stats = []
+        false_stats = []
+        processed_hostnames = set()  # Set to keep track of processed IPs
+
+        def process_item(item):
+            # Process FQDN to hostname
+            if 'lldp_neighbor_device' in item and item['lldp_neighbor_device']:
+                fqdn = item['lldp_neighbor_device']
+                item['lldp_neighbor_device'] = fqdn.split('.')[0]  # Take the first part before the dot
+
+            # Separate items based on exists_in_master_switch_stats
+            if item['exists_in_master_switch_stats']:
+                true_stats.append(item)
+            else:
+                false_stats.append(item)
+
+            # Fetch LLDP neighbors if not already processed
+            neighbor_hostname = item.get('neighbor_switch_hostname')
+            if neighbor_hostname:
+                neighbor_hostname = neighbor_hostname.split('.')[0]  # Normalize hostname
+            if neighbor_hostname and neighbor_hostname not in processed_hostnames:
+                processed_hostnames.add(neighbor_hostname)
+                if item.get('exists_in_master_switch_stats'):
+                    neighbor_url = f"http://127.0.0.1:5000/api/db/get_lldp_neighbors/{neighbor_hostname}"
+                    neighbor_data = fetch_data(neighbor_url)
+                    if neighbor_data:
+                        for neighbor in neighbor_data:
+                            process_item(neighbor)
+
+        # Process the initial data
+        for item in data:
+            process_item(item)
+
+        # Find the core switch in the true_stats list
+        link_count = defaultdict(int)
+
+        for item in true_stats:
+            if 'lldp_neighbor_device' in item:
+                link_count[item['lldp_neighbor_device']] += 1
+
+        core_switch = max(link_count, key=link_count.get)
+
+        # Check for the second core switch
+        second_core_switch = None
+        if core_switch.endswith('1'):
+            potential_second_core = core_switch[:-1] + '2'
+            # Check in true_stats and false_stats
+            for item in true_stats + false_stats:
+                if item.get('lldp_neighbor_device') == potential_second_core:
+                    second_core_switch = potential_second_core
+                    break
+        elif core_switch.endswith('2'):
+            potential_second_core = core_switch[:-1] + '1'
+            for item in true_stats + false_stats:
+                if item.get('lldp_neighbor_device') == potential_second_core:
+                    second_core_switch = potential_second_core
+                    break
+
+        # Remove the second core switch from the lists if found
+        if second_core_switch:
+            true_stats = [item for item in true_stats if item['lldp_neighbor_device'] != second_core_switch]
+            false_stats = [item for item in false_stats if item['lldp_neighbor_device'] != second_core_switch]
+
+        # Create JSON representation
+        network_tree = []
+        added_switches = set()
+
+        def add_item_to_tree(item):
+            if item['lldp_neighbor_device'] not in added_switches and item['lldp_neighbor_device'] != second_core_switch:
+                status = "true" if item in true_stats else "false"
+                node = {
+                    'name': item['lldp_neighbor_device'],
+                    'status': status,
+                    'children': []
+                }
+                added_switches.add(item['lldp_neighbor_device'])
+                children_true = [x for x in true_stats if x['source_switch_hostname'] == item['lldp_neighbor_device']]
+                children_false = [x for x in false_stats if x['source_switch_hostname'] == item['lldp_neighbor_device']]
+                for child in children_true + children_false:
+                    child_node = add_item_to_tree(child)
+                    if child_node:
+                        node['children'].append(child_node)
+                return node
+            return None
+
+        # Add core switch
+        if core_switch not in added_switches:
+            network_tree.append(add_item_to_tree({'lldp_neighbor_device': core_switch, 'exists_in_master_switch_stats': True}))
+
+        # Add children of core switch from both true_stats and false_stats
+        core_children = [x for x in true_stats + false_stats if x['source_switch_hostname'] == core_switch]
+        for item in core_children:
+            child_node = add_item_to_tree(item)
+            if child_node:
+                network_tree.append(child_node)
+
+        return network_tree
+    else:
+        return None
 
 def setup_database():
     conn = psycopg2.connect(**db_params)
@@ -268,6 +382,108 @@ def get_switch(identifier):
         return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
     finally:
         conn.close()
+
+     
+@app.route('/api/db/get_lldp_neighbors/<identifier>', methods=['GET'])
+def get_lldp_neighbors(identifier):
+    conn = psycopg2.connect(**db_params)
+    try:
+        with conn.cursor() as cursor:
+            # Fetch all switches from master_switch_stats
+            cursor.execute("SELECT id, hostname, ip_address FROM master_switch_stats")
+            switches = cursor.fetchall()
+
+            # Normalize the identifier to handle case-insensitivity
+
+            # Find the switch by identifier
+            identifier_short = identifier.split('.')[0]
+
+            # Find the switch by identifier
+            switch = next(
+                (s for s in switches 
+                 if s[1] == identifier or 
+                    s[1].startswith(identifier_short + '.') or 
+                    s[1].split('.')[0] == identifier_short or 
+                    s[2] == identifier), 
+                None
+            )
+            if not switch:
+                return jsonify({"error": "Switch not found"}), 404
+
+            switch_id = switch[0]
+            switch_hostname = switch[1]
+
+            cursor.execute("""
+                SELECT DISTINCT ON (port) port, lldp_neighbor, lldp_neighbor_device, lldp_neighbor_mgmt_ip
+                FROM historical_interface_stats
+                WHERE switch_id = %s AND lldp_neighbor IS NOT NULL
+                ORDER BY port, timestamp DESC;
+            """, (switch_id,))
+            lldp_neighbors = cursor.fetchall()
+
+            neighbor_list = []
+            for neighbor in lldp_neighbors:
+                port = neighbor[0]
+                lldp_neighbor = neighbor[1]
+                lldp_neighbor_device = neighbor[2]
+                lldp_neighbor_mgmt_ip = neighbor[3]
+
+                # Skip entries with no LLDP information
+                if not lldp_neighbor and not lldp_neighbor_device and not lldp_neighbor_mgmt_ip:
+                    continue
+                
+                neighbor_switch = None
+                if lldp_neighbor_device:
+                    neighbor_device_lower = lldp_neighbor_device.split('.')[0].lower()
+                    neighbor_switch = next(
+                        (s for s in switches 
+                         if s[1].lower().startswith(neighbor_device_lower)), 
+                        None
+                    )
+                if not neighbor_switch and lldp_neighbor_mgmt_ip:
+                    neighbor_switch = next((s for s in switches if s[2] == lldp_neighbor_mgmt_ip), None)
+                
+                neighbor_exists = neighbor_switch is not None
+                neighbor_hostname = neighbor_switch[1] if neighbor_switch else lldp_neighbor_device.split('.')[0] if lldp_neighbor_device else ""
+
+                # Get the port details on the neighbor switch if it exists
+                connected_port_details = None
+                if neighbor_exists:
+                    cursor.execute("""
+                        SELECT port
+                        FROM historical_interface_stats
+                        WHERE switch_id = %s AND lldp_neighbor_device LIKE %s
+                        ORDER BY timestamp DESC LIMIT 1;
+                    """, (neighbor_switch[0], f"%{switch_hostname.split('.')[0]}%"))
+                    connected_port_details = cursor.fetchone()
+
+                neighbor_list.append({
+                    "source_switch_hostname": switch_hostname,
+                    "source_port": port,
+                    "lldp_neighbor": lldp_neighbor,
+                    "lldp_neighbor_device": lldp_neighbor_device,
+                    "lldp_neighbor_mgmt_ip": lldp_neighbor_mgmt_ip,
+                    "exists_in_master_switch_stats": neighbor_exists,
+                    "neighbor_switch_hostname": neighbor_hostname,
+                    "neighbor_connected_port": connected_port_details[0] if connected_port_details else None
+                })
+        
+        return jsonify(neighbor_list), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        print(traceback.format_exc())
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/db/generate_network_tree/<ip_address>', methods=['GET'])
+def generate_network_tree_route(ip_address):
+    initial_url = f"http://127.0.0.1:5000/api/db/get_lldp_neighbors/{ip_address}"
+    network_tree = generate_network_tree(initial_url)
+    if network_tree is not None:
+        return jsonify(network_tree), 200
+    else:
+        return jsonify({"error": "Failed to fetch initial data."}), 500
 
 @app.route('/api/db/get_all_ports/<identifier>', methods=['GET'])
 def get_all_ports(identifier):

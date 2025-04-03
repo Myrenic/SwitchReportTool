@@ -8,8 +8,7 @@ import SwitchInterfaces from './pages/switch/SwitchInterfaces'
 import HomePage from './pages/Index';
 import Switch from './pages/Switch'
 import ReqSwitch from './pages/switch/ReqSwitch';
-
-
+import LLDPNeighbors from './pages/switch/LLDPNeighbors'
 const router = createBrowserRouter([
   {
     Component: App,
@@ -41,6 +40,10 @@ const router = createBrowserRouter([
           {
             path: 'switch/request',
             Component: ReqSwitch,
+          },
+          {
+            path: 'switch/LLDPNeighbors',
+            Component: LLDPNeighbors,
           },
         ],
       },

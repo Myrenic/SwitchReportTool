@@ -7,23 +7,26 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7",
+    "@mui/material": "^7.0.1",
+    "@mui/material-nextjs": "^6",
+    "@toolpad/core": "0.13.0",
     "esbuild": ">=0.25.0",
     "react": "^19",
+    "react-d3-tree": "^3.6.6",
     "react-dom": "^19",
-    "@toolpad/core": "0.13.0",
-    "@mui/material": "^6",
-    "@mui/material-nextjs": "^6",
-    "@mui/icons-material": "^6",
-    "@emotion/react": "^11",
-    "@emotion/styled": "^11",
-    "react-router": "^7"
+    "react-router": "^7",
+    "react-tree-graph": "^8.0.3",
+    "reactflow": "^11.11.4"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "^8",
     "@vitejs/plugin-react": "^4.3.2",
+    "eslint": "^8",
+    "typescript": "^5",
     "vite": "^5.4.8"
   }
 }

@@ -1,0 +1,42 @@
+.node__root > circle, .node__branch > circle, .node__leaf > circle {
+    stroke: #fff;
+    stroke-width: 2;
+}
+
+.node__root > circle {
+    fill: #ff0000;
+}
+
+.node__branch > circle {
+    fill: #4A90E2;
+}
+
+.node__leaf > circle {
+    fill: #e35050;
+}
+
+.node__root > text.name, .node__branch > text.name, .node__leaf > text.name {
+    font-size: 14px;
+    fill: #fff;
+    font-weight: bold;
+}
+
+.node__root > text.attributes, .node__branch > text.attributes, .node__leaf > text.attributes {
+    font-size: 12px;
+    fill: #ddd;
+}
+
+.link {
+    stroke: #ccc;
+    stroke-width: 0;
+}
+
+.node__indexed circle {
+    fill: green;
+    stroke-width: 0;
+}
+
+.node__not-indexed circle {
+    fill: red;
+    stroke-width: 0;
+}

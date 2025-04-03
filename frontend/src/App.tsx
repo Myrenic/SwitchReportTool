@@ -9,6 +9,7 @@ import type { Navigation } from '@toolpad/core/AppProvider';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../theme'; 
 import AddIcon from '@mui/icons-material/Add';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 const NAVIGATION: Navigation = [
    {segment: '',
@@ -31,10 +32,16 @@ const NAVIGATION: Navigation = [
         icon: <FindInPageIcon />,
       },
       {
+        segment: 'switch/LLDPNeighbors',
+        title: 'Show LLDP Neighbors',
+        icon: <AccountTreeIcon />,
+      },
+      {
         segment: 'switch/request',
         title: 'Add Switch',
         icon: <AddIcon />,
-      },
+      } 
+
 ]
 
 

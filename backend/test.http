@@ -5,7 +5,7 @@ GET http://localhost:5000/
 
 
 ### Get All Ports
-GET http://localhost:5000/get_all_ports/NLGRO-B1-MERA-LAN06
+GET http://localhost:5000/api/db/get_all_ports/NLGRO-S40-CS01
 
 
 ### Get Latest Ports for a Specific Switch
@@ -13,13 +13,19 @@ GET http://localhost:5000/api/db/get_latest_ports/10.115.193.50
 
 
 ### Get Switch Data by Hostname
-GET http://localhost:5000/api/db/get_switch/10.115.193.50
+GET http://localhost:5000/api/db/get_latest_ports/ITFER-LAN-RACK20
 
 ### Get Switch Data by IP Address
 GET https://nlgro-docker-p1/api/db/get_all_switches
 
-
+### Get Switch Data by IP Address
+GET http://127.0.0.1:5000/api/db/get_lldp_neighbors/10.115.193.253
 ### Call the update_switch API
+
+
+get http://127.0.0.1:5000/api/db/generate_network_tree/10.115.193.253
+
+###
 POST http://127.0.0.1:5001/api/update_switch
 Content-Type: application/json
 
@@ -32,7 +38,7 @@ POST http://127.0.0.1:5001/api/cisco/add_switch
 Content-Type: application/json
 
 {
-  "ip_address": "10.115.193.254",
+  "ip_address": "10.115.193.253",
   "password": "henk",
   "platform": "arista_eos"
 }
