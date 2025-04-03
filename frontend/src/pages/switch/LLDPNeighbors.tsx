@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import SwitchList from '../../components/SwitchLists'; // Adjust the import path as necessary
 import './custom-tree.css';
-
+import config from '../../config';
 const theme = createTheme();
 
 const truncateText = (text, maxLength = 20) => (
@@ -60,7 +60,10 @@ const LLDPNeighborsView = () => {
   const fetchData = async (switchName) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/db/generate_network_tree/${switchName}`);
+      const dbUrl = config.DATABASE_API_URL;
+      console.log(config.DATABASE_API_URL);
+      
+      const response = await fetch(`${dbUrl}/generate_network_tree/${switchName}`);
       const result = await response.json();
       setData(transformData(result));
     } catch (error) {
