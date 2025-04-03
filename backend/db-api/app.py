@@ -9,6 +9,7 @@ import re
 import json
 import requests
 from collections import defaultdict
+
 load_dotenv()
 
 app = Flask(__name__)
