@@ -17,6 +17,8 @@ const SwitchInterfaces = () => {
       .then(data => setSwitchPorts(data))
       .catch(error => console.error('Error fetching switch ports:', error));
   };
+  console.log(config);
+
 
   const fetchSwitchDetails = (identifier) => {
     fetch(`${dbUrl}/get_switch/${identifier}`)
