@@ -9,7 +9,7 @@ GET http://localhost:5000/api/db/get_all_ports/NLGRO-S40-CS01
 
 
 ### Get Latest Ports for a Specific Switch
-GET http://localhost:5000/api/db/get_latest_ports/10.115.193.50
+GET http://localhost:5000/api/db/get_latest_ports/10.115.193.42
 
 
 ### Get Switch Data by Hostname
@@ -47,7 +47,7 @@ POST http://127.0.0.1:5001/api/cisco/add_switch
 Content-Type: application/json
 
 {
-  "ip_address": "10.115.193.47",
+  "ip_address": "10.115.193.42",
   "password": "henk",
   "platform": "cisco_ios"
 }

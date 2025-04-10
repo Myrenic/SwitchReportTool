@@ -25,6 +25,7 @@ const SwitchInterfaces = () => {
       .catch(error => console.error('Error fetching switch details:', error));
   };
 
+
   const handleSelectSwitch = (sw) => {
     setSelectedSwitch(null); // Clear previous selection while fetching new data
     fetchSwitchDetails(sw.hostname);

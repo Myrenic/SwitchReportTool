@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 const SwitchDetails = ({ switch: selectedSwitch }) => {
+  console.log(selectedSwitch)
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
     // Format the date to "02-Apr-2025 on 12:37"
@@ -32,6 +33,9 @@ const SwitchDetails = ({ switch: selectedSwitch }) => {
       </Typography>
       <Typography variant="body1">
         <strong>Hardware:</strong> {selectedSwitch.hardware.join(', ')}
+      </Typography>
+      <Typography variant="body1">
+        <strong>Power usage:</strong> {selectedSwitch.total_power_usage || ""}w
       </Typography>
       <Typography variant="body1">
         <strong>MAC Address:</strong> {selectedSwitch.mac_address.join(', ')}

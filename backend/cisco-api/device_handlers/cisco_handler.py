@@ -37,7 +37,7 @@ def process_cisco_output(output, host_data):
     switch_version = output.get("show version", [{}])[0]
     arp_table = output.get("show arp", [])
     lldp_neighbors = output.get("show lldp neighbors detail", [])
-
+    show_power_inline = output.get("show power inline", [])
     if isinstance(lldp_neighbors, str):
         lldp_neighbors = []
 
@@ -51,6 +51,7 @@ def process_cisco_output(output, host_data):
         "device_type": "cisco_ios"
     }
 
+    total_power_usage = 0.0
     interface_stats = []
 
     for port_info in interfaces_status:
@@ -82,6 +83,21 @@ def process_cisco_output(output, host_data):
 
         combined_entry['switch_name'] = switch_version.get('hostname', 'N/A')
 
+        # Add POE data
+        poe_info = next((poe for poe in show_power_inline if poe.get('interface') == port), None)
+        if poe_info:
+            poe_power_usage = float(poe_info.get('power', 0.0))
+            combined_entry['poe_power_usage'] = poe_power_usage
+            combined_entry['poe_device'] = poe_info.get('device', 'N/A')
+            combined_entry['poe_class'] = poe_info.get('class', 'N/A')
+            total_power_usage += poe_power_usage
+        else:
+            combined_entry['poe_power_usage'] = 0.0
+            combined_entry['poe_device'] = 'N/A'
+            combined_entry['poe_class'] = 'N/A'
+
         interface_stats.append(combined_entry)
+
+    switch_stats['total_power_usage'] = round(total_power_usage)
 
     return {"switch_stats": switch_stats, "interface_stats": interface_stats}
