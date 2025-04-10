@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS historical_switch_stats (
     id SERIAL PRIMARY KEY,
     switch_id INTEGER REFERENCES master_switch_stats(id),
     uptime VARCHAR(255),
+    total_power_usage VARCHAR(255),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
@@ -64,6 +65,9 @@ CREATE TABLE IF NOT EXISTS historical_interface_stats (
     lldp_neighbor VARCHAR(255),
     lldp_neighbor_device VARCHAR(255),
     lldp_neighbor_mgmt_ip VARCHAR(50),
+    poe_power_usage NUMERIC, 
+    poe_device VARCHAR(255),  
+    poe_class VARCHAR(50),    
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
@@ -241,16 +245,16 @@ def store_data():
             
             # Insert into historical_switch_stats
             cursor.execute("""
-                INSERT INTO historical_switch_stats (switch_id, uptime)
-                VALUES (%s, %s);
-            """, (switch_id, switch_stats['uptime']))
+                INSERT INTO historical_switch_stats (switch_id, uptime, total_power_usage)
+                VALUES (%s, %s, %s);
+            """, (switch_id, switch_stats['uptime'], switch_stats.get('total_power_usage')))
             
             # Insert into historical_interface_stats
             for interface in interface_stats:
                 cursor.execute("""
-                    INSERT INTO historical_interface_stats (switch_id, port, name, status, vlan_id, duplex, speed, type, fc_mode, mac_address, ip_address, switch_name, lldp_neighbor, lldp_neighbor_device, lldp_neighbor_mgmt_ip)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                """, (switch_id, interface['port'], interface['name'], interface['status'], interface['vlan_id'], interface['duplex'], interface['speed'], interface['type'], interface['fc_mode'], interface['mac_address'], interface['ip_address'], interface['switch_name'], interface['lldp_neighbor'], interface['lldp_neighbor_device'], interface['lldp_neighbor_mgmt_ip']))
+                    INSERT INTO historical_interface_stats (switch_id, port, name, status, vlan_id, duplex, speed, type, fc_mode, mac_address, ip_address, switch_name, lldp_neighbor, lldp_neighbor_device, lldp_neighbor_mgmt_ip, poe_power_usage, poe_device, poe_class)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                """, (switch_id, interface['port'], interface['name'], interface['status'], interface['vlan_id'], interface['duplex'], interface['speed'], interface['type'], interface['fc_mode'], interface['mac_address'], interface['ip_address'], interface['switch_name'], interface['lldp_neighbor'], interface['lldp_neighbor_device'], interface['lldp_neighbor_mgmt_ip'], interface.get('poe_power_usage'), interface.get('poe_device'), interface.get('poe_class')))
             
         return jsonify({"message": "Data stored successfully"}), 201
     except Exception as e:
@@ -331,7 +335,10 @@ def get_latest_ports(identifier):
                     "lldp_neighbor": port[13],
                     "lldp_neighbor_device": port[14],
                     "lldp_neighbor_mgmt_ip": port[15],
-                    "timestamp": port[16]
+                    "poe_power_usage": port[16],  # Added POE power usage
+                    "poe_device": port[17],  # Added POE device
+                    "poe_class": port[18],  # Added POE class
+                    "timestamp": port[19]
                 })
         return jsonify(port_list), 200
     except Exception as e:
@@ -365,16 +372,17 @@ def get_switch(identifier):
                 "platform": switch[6]
             }
 
-            # Get the latest uptime data
+            # Get the latest uptime and total_power_usage data
             cursor.execute("""
-                SELECT uptime, timestamp FROM historical_switch_stats
+                SELECT uptime, total_power_usage, timestamp FROM historical_switch_stats
                 WHERE switch_id = %s
                 ORDER BY timestamp DESC LIMIT 1;
             """, (switch_data["id"],))
             uptime_data = cursor.fetchone()
             if uptime_data:
                 switch_data["latest_uptime"] = uptime_data[0]
-                switch_data["uptime_timestamp"] = uptime_data[1]
+                switch_data["total_power_usage"] = uptime_data[1]
+                switch_data["uptime_timestamp"] = uptime_data[2]
 
         return jsonify(switch_data), 200
     except Exception as e:
@@ -383,8 +391,7 @@ def get_switch(identifier):
         return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
     finally:
         conn.close()
-
-     
+  
 @app.route('/api/db/get_lldp_neighbors/<identifier>', methods=['GET'])
 def get_lldp_neighbors(identifier):
     conn = psycopg2.connect(**db_params)
@@ -530,7 +537,10 @@ def get_all_ports(identifier):
                     "lldp_neighbor": port[13],
                     "lldp_neighbor_device": port[14],
                     "lldp_neighbor_mgmt_ip": port[15],
-                    "timestamp": port[16]
+                    "poe_power_usage": port[16],  # Added POE power usage
+                    "poe_device": port[17],  # Added POE device
+                    "poe_class": port[18],  # Added POE class
+                    "timestamp": port[19]
                 })
         return jsonify(port_list), 200
     except Exception as e:
@@ -577,7 +587,10 @@ def get_ports_by_mac(mac_address):
                     "lldp_neighbor": port[13],
                     "lldp_neighbor_device": port[14],
                     "lldp_neighbor_mgmt_ip": port[15],
-                    "timestamp": port[16]
+                    "poe_power_usage": port[16],  # Added POE power usage
+                    "poe_device": port[17],  # Added POE device
+                    "poe_class": port[18],  # Added POE class
+                    "timestamp": port[19]
                 })
         return jsonify(port_list), 200
     except Exception as e:

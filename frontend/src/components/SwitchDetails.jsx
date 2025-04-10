@@ -34,6 +34,9 @@ const SwitchDetails = ({ switch: selectedSwitch }) => {
         <strong>Hardware:</strong> {selectedSwitch.hardware.join(', ')}
       </Typography>
       <Typography variant="body1">
+        <strong>Power usage:</strong> {selectedSwitch.total_power_usage || ""}w
+      </Typography>
+      <Typography variant="body1">
         <strong>MAC Address:</strong> {selectedSwitch.mac_address.join(', ')}
       </Typography>
       <Typography variant="body1">

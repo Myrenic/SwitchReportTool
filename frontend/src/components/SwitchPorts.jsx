@@ -11,6 +11,7 @@ import {
   IconButton,
   Collapse,
   Box,
+  Typography,
 } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -73,13 +74,9 @@ const Row = ({ row }) => {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell>{row.port || 'N/A'}</TableCell>
-        <TableCell>{row.status || 'N/A'}</TableCell>
-        <TableCell>{row.duplex || 'N/A'}</TableCell>
-        <TableCell>{row.speed || 'N/A'}</TableCell>
-        <TableCell>{row.mac_address || 'N/A'}</TableCell>
         <TableCell>
           <Box display="flex" alignItems="center">
+            {row.port || 'N/A'}
             {row.lldp_neighbor && (
               <Box
                 component="span"
@@ -89,13 +86,30 @@ const Row = ({ row }) => {
                   borderRadius: '50%',
                   backgroundColor: 'red',
                   display: 'inline-block',
-                  marginRight: 1,
+                  marginLeft: 1,
                 }}
               />
             )}
-            {row.vlan_id || 'N/A'}
+            {row.poe_power_usage && row.poe_power_usage > 0 && (
+              <Box
+                component="span"
+                sx={{
+                  height: 8,
+                  width: 8,
+                  borderRadius: '50%',
+                  backgroundColor: 'magenta',
+                  display: 'inline-block',
+                  marginLeft: 1,
+                }}
+              />
+            )}
           </Box>
         </TableCell>
+        <TableCell>{row.status || 'N/A'}</TableCell>
+        <TableCell>{row.duplex || 'N/A'}</TableCell>
+        <TableCell>{row.speed || 'N/A'}</TableCell>
+        <TableCell>{row.mac_address || 'N/A'}</TableCell>
+        <TableCell>{row.vlan_id || 'N/A'}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
@@ -118,6 +132,18 @@ const Row = ({ row }) => {
                   <TableRow>
                     <TableCell>LLDP Neighbor Mgmt IP</TableCell>
                     <TableCell>{row.lldp_neighbor_mgmt_ip || 'N/A'}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>POE Power Usage </TableCell>
+                    <TableCell>{row.poe_power_usage != null ? row.poe_power_usage+"w" : 'N/A'}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>POE Device</TableCell>
+                    <TableCell>{row.poe_device || 'N/A'}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>POE Class</TableCell>
+                    <TableCell>{row.poe_class || 'N/A'}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Timestamp</TableCell>
@@ -184,6 +210,36 @@ const SwitchPorts = ({ ports }) => {
           ))}
         </TableBody>
       </Table>
+      <Box mt={2} p={2} display="flex" justifyContent="left" alignItems="center">
+        <Box display="flex" alignItems="center" mr={2}>
+          <Box
+            component="span"
+            sx={{
+              height: 8,
+              width: 8,
+              borderRadius: '50%',
+              backgroundColor: 'red',
+              display: 'inline-block',
+              marginRight: 1,
+            }}
+          />
+          <Typography variant="body2">LLDP Neighbor</Typography>
+        </Box>
+        <Box display="flex" alignItems="center">
+          <Box
+            component="span"
+            sx={{
+              height: 8,
+              width: 8,
+              borderRadius: '50%',
+              backgroundColor: 'magenta',
+              display: 'inline-block',
+              marginRight: 1,
+            }}
+          />
+          <Typography variant="body2">POE Power Usage</Typography>
+        </Box>
+      </Box>
     </TableContainer>
   );
 };
