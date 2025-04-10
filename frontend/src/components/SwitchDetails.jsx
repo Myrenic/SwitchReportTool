@@ -3,7 +3,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 const SwitchDetails = ({ switch: selectedSwitch }) => {
-  console.log(selectedSwitch)
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
     // Format the date to "02-Apr-2025 on 12:37"
