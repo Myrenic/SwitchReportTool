@@ -25,6 +25,7 @@ db_params = {
 }
 
 # SQL commands for creating tables
+# SQL commands for creating tables
 create_master_table = """
 CREATE TABLE IF NOT EXISTS master_switch_stats (
     id SERIAL PRIMARY KEY,
@@ -67,7 +68,23 @@ CREATE TABLE IF NOT EXISTS historical_interface_stats (
     lldp_neighbor_mgmt_ip VARCHAR(50),
     poe_power_usage NUMERIC, 
     poe_device VARCHAR(255),  
-    poe_class VARCHAR(50),    
+    poe_class VARCHAR(50),
+    delay VARCHAR(50),    
+    description VARCHAR(255),
+    encapsulation VARCHAR(50),
+    hardware_type VARCHAR(50),
+    interface VARCHAR(50),
+    last_input VARCHAR(50),
+    last_output VARCHAR(50),
+    last_output_hang VARCHAR(50),
+    link_status VARCHAR(50),
+    media_type VARCHAR(50),
+    mtu VARCHAR(50),
+    output_errors VARCHAR(50),
+    output_packets VARCHAR(50),
+    output_pps VARCHAR(50),
+    output_rate VARCHAR(50),
+    protocol_status VARCHAR(50),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
@@ -252,9 +269,9 @@ def store_data():
             # Insert into historical_interface_stats
             for interface in interface_stats:
                 cursor.execute("""
-                    INSERT INTO historical_interface_stats (switch_id, port, name, status, vlan_id, duplex, speed, type, fc_mode, mac_address, ip_address, switch_name, lldp_neighbor, lldp_neighbor_device, lldp_neighbor_mgmt_ip, poe_power_usage, poe_device, poe_class)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                """, (switch_id, interface['port'], interface['name'], interface['status'], interface['vlan_id'], interface['duplex'], interface['speed'], interface['type'], interface['fc_mode'], interface['mac_address'], interface['ip_address'], interface['switch_name'], interface['lldp_neighbor'], interface['lldp_neighbor_device'], interface['lldp_neighbor_mgmt_ip'], interface.get('poe_power_usage'), interface.get('poe_device'), interface.get('poe_class')))
+                    INSERT INTO historical_interface_stats (switch_id, port, name, status, vlan_id, duplex, speed, type, mac_address, ip_address, switch_name, lldp_neighbor, lldp_neighbor_device, lldp_neighbor_mgmt_ip, poe_power_usage, poe_device, poe_class, delay, description, encapsulation, hardware_type, interface, last_input, last_output, last_output_hang, link_status, media_type, mtu, output_errors, output_packets, output_pps, output_rate, protocol_status)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                """, (switch_id, interface['port'], interface['name'], interface['status'], interface['vlan_id'], interface['duplex'], interface['speed'], interface['type'], interface['mac_address'], interface['ip_address'], interface['switch_name'], interface['lldp_neighbor'], interface['lldp_neighbor_device'], interface['lldp_neighbor_mgmt_ip'], interface.get('poe_power_usage'), interface.get('poe_device'), interface.get('poe_class'), interface.get('delay'), interface.get('description'), interface.get('encapsulation'), interface.get('hardware_type'), interface.get('interface'), interface.get('last_input'), interface.get('last_output'), interface.get('last_output_hang'), interface.get('link_status'), interface.get('media_type'), interface.get('mtu'), interface.get('output_errors'), interface.get('output_packets'), interface.get('output_pps'), interface.get('output_rate'), interface.get('protocol_status')))
             
         return jsonify({"message": "Data stored successfully"}), 201
     except Exception as e:
@@ -335,10 +352,26 @@ def get_latest_ports(identifier):
                     "lldp_neighbor": port[13],
                     "lldp_neighbor_device": port[14],
                     "lldp_neighbor_mgmt_ip": port[15],
-                    "poe_power_usage": port[16],  # Added POE power usage
-                    "poe_device": port[17],  # Added POE device
-                    "poe_class": port[18],  # Added POE class
-                    "timestamp": port[19]
+                    "poe_power_usage": port[16],
+                    "poe_device": port[17],
+                    "poe_class": port[18],
+                    "delay": port[19],
+                    "description": port[20],
+                    "encapsulation": port[21],
+                    "hardware_type": port[22],
+                    "interface": port[23],
+                    "last_input": port[24],
+                    "last_output": port[25],
+                    "last_output_hang": port[26],
+                    "link_status": port[27],
+                    "media_type": port[28],
+                    "mtu": port[29],
+                    "output_errors": port[30],
+                    "output_packets": port[31],
+                    "output_pps": port[32],
+                    "output_rate": port[33],
+                    "protocol_status": port[34],
+                    "timestamp": port[35]
                 })
         return jsonify(port_list), 200
     except Exception as e:
@@ -537,10 +570,26 @@ def get_all_ports(identifier):
                     "lldp_neighbor": port[13],
                     "lldp_neighbor_device": port[14],
                     "lldp_neighbor_mgmt_ip": port[15],
-                    "poe_power_usage": port[16],  # Added POE power usage
-                    "poe_device": port[17],  # Added POE device
-                    "poe_class": port[18],  # Added POE class
-                    "timestamp": port[19]
+                    "poe_power_usage": port[16],
+                    "poe_device": port[17],
+                    "poe_class": port[18],
+                    "delay": port[19],
+                    "description": port[20],
+                    "encapsulation": port[21],
+                    "hardware_type": port[22],
+                    "interface": port[23],
+                    "last_input": port[24],
+                    "last_output": port[25],
+                    "last_output_hang": port[26],
+                    "link_status": port[27],
+                    "media_type": port[28],
+                    "mtu": port[29],
+                    "output_errors": port[30],
+                    "output_packets": port[31],
+                    "output_pps": port[32],
+                    "output_rate": port[33],
+                    "protocol_status": port[34],
+                    "timestamp": port[35]
                 })
         return jsonify(port_list), 200
     except Exception as e:

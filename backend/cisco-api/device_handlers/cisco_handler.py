@@ -31,8 +31,18 @@ def run_cisco_commands(host_data, commands):
         net_connect.disconnect()
     return output
 
+def normalize_port_name(port):
+    if port.startswith("GigabitEthernet"):
+        return port.replace("GigabitEthernet", "Gi")
+    elif port.startswith("FastEthernet"):
+        return port.replace("FastEthernet", "Fa")
+    elif port.startswith("TenGigabitEthernet"):
+        return port.replace("TenGigabitEthernet", "Te")
+    return port
+
 def process_cisco_output(output, host_data):
     interfaces_status = output.get("show interfaces status", [])
+    interfaces = output.get("show interfaces", [])
     mac_address_table = output.get("show mac address-table", [])
     switch_version = output.get("show version", [{}])[0]
     arp_table = output.get("show arp", [])
@@ -57,6 +67,16 @@ def process_cisco_output(output, host_data):
     for port_info in interfaces_status:
         combined_entry = port_info.copy()
         port = port_info.get('port', 'N/A')
+        
+        # Normalize port names for comparison
+        normalized_port_status = normalize_port_name(port)
+        
+        combined_entry['vlan'] = port_info['vlan_id']
+
+        # Add interface details if available
+        interface_detail = next((interface for interface in interfaces if normalize_port_name(interface.get('interface', '')) == normalized_port_status), None)
+        if interface_detail:
+            combined_entry.update(interface_detail)
 
         mac_info = next((mac for mac in mac_address_table if port in mac.get('destination_port', [])), None)
         if mac_info:

@@ -66,6 +66,10 @@ const stableSort = (array, comparator) => {
 const Row = ({ row }) => {
   const [open, setOpen] = React.useState(false);
 
+  const rowDetails = Object.entries(row).filter(
+    ([key, value]) => value && value !== 'N/A' && value !== null
+  );
+
   return (
     <>
       <TableRow>
@@ -117,38 +121,12 @@ const Row = ({ row }) => {
             <Box margin={1}>
               <Table size="small" aria-label="details">
                 <TableBody>
-                  <TableRow>
-                    <TableCell>Type</TableCell>
-                    <TableCell>{row.type || 'N/A'}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>LLDP Neighbor</TableCell>
-                    <TableCell>{row.lldp_neighbor || 'N/A'}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>LLDP Neighbor Device</TableCell>
-                    <TableCell>{row.lldp_neighbor_device || 'N/A'}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>LLDP Neighbor Mgmt IP</TableCell>
-                    <TableCell>{row.lldp_neighbor_mgmt_ip || 'N/A'}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>POE Power Usage </TableCell>
-                    <TableCell>{row.poe_power_usage != null ? row.poe_power_usage+"w" : 'N/A'}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>POE Device</TableCell>
-                    <TableCell>{row.poe_device || 'N/A'}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>POE Class</TableCell>
-                    <TableCell>{row.poe_class || 'N/A'}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Timestamp</TableCell>
-                    <TableCell>{row.timestamp || 'N/A'}</TableCell>
-                  </TableRow>
+                  {rowDetails.map(([key, value]) => (
+                    <TableRow key={key}>
+                      <TableCell>{key.replace(/_/g, ' ')}</TableCell>
+                      <TableCell>{value}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </Box>

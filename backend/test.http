@@ -13,7 +13,7 @@ GET http://localhost:5000/api/db/get_latest_ports/10.115.193.42
 
 
 ### Get Switch Data by Hostname
-GET http://localhost:5000/api/db/get_latest_ports/ITFER-LAN-RACK20
+GET http://localhost:5000/api/db/get_latest_ports/10.115.193.42
 
 ### Get Switch Data by IP Address
 GET https://nlgro-docker-p1/api/db/get_all_switches

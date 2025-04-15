@@ -66,7 +66,7 @@ def initialize_routes(app):
         }
 
         if platform == "cisco_ios":
-            commands = ["show interfaces status", "show mac address-table", "show version", "show arp", "show lldp neighbors detail", "show power inline"]
+            commands = ["show interfaces status", "show mac address-table", "show version", "show arp", "show lldp neighbors detail", "show power inline","show interfaces"]
             output = run_cisco_commands(host_data, commands)
             processed_data = process_cisco_output(output, host_data)
         elif platform == "arista_eos":
