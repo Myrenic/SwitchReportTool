@@ -71,7 +71,6 @@ def process_cisco_output(output, host_data):
         # Normalize port names for comparison
         normalized_port_status = normalize_port_name(port)
         
-        combined_entry['vlan'] = port_info['vlan_id']
 
         # Add interface details if available
         interface_detail = next((interface for interface in interfaces if normalize_port_name(interface.get('interface', '')) == normalized_port_status), None)
@@ -115,7 +114,7 @@ def process_cisco_output(output, host_data):
             combined_entry['poe_power_usage'] = 0.0
             combined_entry['poe_device'] = 'N/A'
             combined_entry['poe_class'] = 'N/A'
-
+        combined_entry['vlan_id'] = port_info['vlan_id']
         interface_stats.append(combined_entry)
 
     switch_stats['total_power_usage'] = round(total_power_usage)
