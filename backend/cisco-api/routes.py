@@ -1,8 +1,10 @@
 import os
+import traceback
 from flask import request, jsonify
 from utils import post_to_api, switch_exists, switch_platform
 from device_handlers.cisco_handler import run_cisco_commands, is_cisco_device, process_cisco_output
 from device_handlers.arista_handler import run_arista_commands, is_arista_device, process_arista_output
+from device_handlers.legacy_handler import fetch_legacy_data, process_legacy_output  # Make sure to import your legacy handlers
 
 def initialize_routes(app):
 
@@ -89,3 +91,22 @@ def initialize_routes(app):
         except Exception as e:
             print(f"Error processing output: {e}")
             return jsonify({"error": "Failed to process switch data"}), 500
+
+    @app.route('/api/legacy_data', methods=['POST'])
+    def legacy_data():
+        ip_address = request.json.get('ip_address')
+        deaddays = request.json.get('deaddays', 14)
+
+        if not ip_address:
+            return jsonify({"error": "IP address is required"}), 400
+
+        try:
+            hostname, table_data, uptime, fqdn = fetch_legacy_data(ip_address, deaddays)
+            processed_data = process_legacy_output(hostname, table_data, {"host": ip_address}, uptime, fqdn)
+
+            return jsonify({"data": processed_data}), 200
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            print(traceback.format_exc())
+            return jsonify({"error": f"Failed to fetch or process legacy data."}), 500

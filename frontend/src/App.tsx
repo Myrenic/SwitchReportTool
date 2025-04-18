@@ -9,6 +9,7 @@ import type { Navigation } from '@toolpad/core/AppProvider';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../theme'; 
 import AddIcon from '@mui/icons-material/Add';
+import ElderlyIcon from '@mui/icons-material/Elderly';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 const NAVIGATION: Navigation = [
@@ -37,10 +38,16 @@ const NAVIGATION: Navigation = [
         icon: <AccountTreeIcon />,
       },
       {
+        segment: 'switch/adhocswitchselect',
+        title: 'Adhoc Switch reporter',
+        icon: <ElderlyIcon />,
+      },
+      {
         segment: 'switch/request',
         title: 'Add Switch',
         icon: <AddIcon />,
-      } 
+      }
+
 
 ]
 

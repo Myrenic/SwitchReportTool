@@ -9,6 +9,8 @@ import HomePage from './pages/Index';
 import Switch from './pages/Switch'
 import ReqSwitch from './pages/switch/ReqSwitch';
 import LLDPNeighbors from './pages/switch/LLDPNeighbors'
+import LegacySwitch from './pages/switch/LegacySwitch'
+
 const router = createBrowserRouter([
   {
     Component: App,
@@ -44,6 +46,10 @@ const router = createBrowserRouter([
           {
             path: 'switch/LLDPNeighbors',
             Component: LLDPNeighbors,
+          },
+          {
+            path: 'switch/adhocswitchselect',
+            Component: LegacySwitch,
           },
         ],
       },

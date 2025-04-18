@@ -16,13 +16,21 @@ GET http://localhost:5000/api/db/get_latest_ports/10.115.193.42
 GET http://localhost:5000/api/db/get_latest_ports/10.115.193.42
 
 ### Get Switch Data by IP Address
-GET https://nlgro-docker-p1/api/db/get_all_switches
+GET http://127.0.0.1:5000/api/db/get_all_switches
 
 ### Get Switch Data by IP Address
 GET http://127.0.0.1:5000/api/db/get_lldp_neighbors/10.115.193.253
 ### Call the update_switch API
 
+### Fetch and Post Legacy Data
+POST http://localhost:5001/api/legacy_data
+Content-Type: application/json
 
+{
+    "ip_address": "10.115.193.47",
+    "deaddays": 14
+}
+###
 get http://127.0.0.1:5000/api/db/generate_network_tree/10.115.193.253
 
 ###
